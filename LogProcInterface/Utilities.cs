@@ -49,7 +49,7 @@ namespace LogProc {
 				else m = Regex.Match(Log.ReceivenContestNo, @"(\d\d\d)(\d*)\w*");
 				int an = int.Parse(m.Groups[2].Value);
 				if(101 <= an && an <= 114) return an.ToString();
-				return m.Groups[2].Value.Substring(0, 2);
+				return m.Groups[2].Value;
 			}
 
 			//
