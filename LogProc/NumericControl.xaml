@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="LogProc.NumericUpDown"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Height="25" Width="Auto">
+
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition />
+			<ColumnDefinition Width="auto"/>
+		</Grid.ColumnDefinitions>
+		<TextBlock Name="tbValue" Width="Auto" Margin="5" Text="0"/>
+		<Grid Grid.Column = "1">
+			<Grid.RowDefinitions>
+				<RowDefinition />
+				<RowDefinition />
+			</Grid.RowDefinitions>
+			<RepeatButton Width="20" Content="^" Delay="500" Interval="100" Click="ValuePlus"/>
+			<RepeatButton Width="20" Content="ˇ" Delay="500" Interval="100" Click="ValueMinus" Grid.Row = "1"/>
+		</Grid>
+		<Border BorderThickness="1" Grid.RowSpan="2" BorderBrush ="#FF7F9DB9" Width="auto" Height="Auto"></Border>
+	</Grid>
+</UserControl>

@@ -1,0 +1,97 @@
+﻿<UserControl x:Class="LogProc.SettingTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d">
+	<TabControl>
+		<TabItem Header="一般" Name="tbGeneral">
+			<ScrollViewer VerticalScrollBarVisibility="Auto">
+				<StackPanel>
+					<Label Content="コンテスト名"/>
+					<ComboBox Name="cbContestName" SelectionChanged="cbContestName_SelectionChanged"/>
+					<Label Content="参加部門"/>
+					<ComboBox Name="cbCategory" IsEnabled="False" SelectionChanged="cbCategory_SelectionChanged"/>
+					<Label Content="最大電力"/>
+					<WrapPanel>
+						<RadioButton Name="rbLicense" Content="免許範囲" GroupName="ContestPower" IsEnabled="False"/>
+						<RadioButton Name="rb100w" Content="100W" GroupName="ContestPower" IsEnabled="False"/>
+						<RadioButton Name="rb1020w" Content="10(20)W" GroupName="ContestPower" IsEnabled="False"/>
+						<RadioButton Name="rb5w" Content="5W" GroupName="ContestPower" IsEnabled="False"/>
+					</WrapPanel>
+					<Label Content="局種係数"/>
+					<CheckBox Name="cbCoefficient" Content="局種係数2" IsChecked="False" IsEnabled="False"/>
+					<Label Content="コンテストナンバー(RS(T)レポート抜き)"/>
+					<TextBox Name="tbContestNo" CharacterCasing="Upper"/>
+					<Label Content="最大空中線電力"/>
+					<WrapPanel>
+						<RadioButton Content="定格出力" Name="rbNormal" GroupName="PowerType" IsChecked="True"/>
+						<Label />
+						<RadioButton Content="実測出力" Name="rbReal" GroupName="PowerType"/>
+					</WrapPanel>
+					<DockPanel>
+						<Label DockPanel.Dock="Right" Content="W"/>
+						<ComboBox Name="cbPowerValue" IsEditable="True">
+							<ComboBoxItem Content="1"/>
+							<ComboBoxItem Content="5"/>
+							<ComboBoxItem Content="10"/>
+							<ComboBoxItem Content="20"/>
+							<ComboBoxItem Content="35"/>
+							<ComboBoxItem Content="50"/>
+							<ComboBoxItem Content="100"/>
+						</ComboBox>
+					</DockPanel>
+					<Label Content="オペレータリスト"/>
+					<CheckBox Content="自動集計" Name="cbAutoOperator" Checked="cbAutoOperator_Checked" Unchecked="cbAutoOperator_Unchecked"/>
+					<TextBox Name="tbOperator" MinLines="3" TextWrapping="Wrap" IsEnabled="False"/>
+				</StackPanel>
+			</ScrollViewer>
+		</TabItem>
+		<TabItem Header="固定" Name="tbSorid">
+			<ScrollViewer VerticalScrollBarVisibility="Auto">
+				<StackPanel>
+					<Label Content="コールサイン"/>
+					<TextBox Name="tbCallSign" CharacterCasing="Upper"/>
+					<Label Content="郵便番号"/>
+					<TextBox Name="tbZipCode"/>
+					<Label Content="住所"/>
+					<TextBox Name="tbAddress"/>
+					<Label Content="電話番号"/>
+					<TextBox Name="tbPhone"/>
+					<Label Content="名前"/>
+					<TextBox Name="tbName"/>
+					<Label Content="メールアドレス"/>
+					<TextBox Name="tbMail"/>
+					<Label Content="局免許者の氏名"/>
+					<TextBox Name="tbLicenserName"/>
+					<Label Content="局免許者の無線従事者資格"/>
+					<ComboBox Name="cbLincenserLicense" IsEditable="True">
+						<ComboBoxItem Content="第１級アマチュア無線技士"/>
+						<ComboBoxItem Content="第２級アマチュア無線技士"/>
+						<ComboBoxItem Content="第３級アマチュア無線技士"/>
+						<ComboBoxItem Content="第４級アマチュア無線技士"/>
+					</ComboBox>
+				</StackPanel>
+			</ScrollViewer>
+		</TabItem>
+		<TabItem Header="移動・他" Name="tbOther">
+			<ScrollViewer VerticalScrollBarVisibility="Auto">
+				<StackPanel>
+					<Label Content="運用地"/>
+					<TextBox Name="tbPlace"/>
+					<Label Content="使用電源"/>
+					<TextBox Name="tbSupply"/>
+					<Label Content="使用設備"/>
+					<DockPanel>
+						<Button Content="設定" DockPanel.Dock="Right" Name="btEquipSet" Click="btEquipSet_Click"/>
+						<TextBox Name="tbEquip"/>
+					</DockPanel>
+					<Label Content="意見"/>
+					<TextBox Name="tbComment" MinLines="2" TextWrapping="Wrap"/>
+					<Label Content="宣誓文"/>
+					<TextBox Name="tbOath" MinLines="3" TextWrapping="Wrap"/>
+				</StackPanel>
+			</ScrollViewer>
+		</TabItem>
+	</TabControl>
+</UserControl>

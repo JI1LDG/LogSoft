@@ -1,0 +1,43 @@
+﻿<Window x:Class="LogProc.LogEdit"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:local="clr-namespace:LogProc"
+        Title="LogEdit" Height="180" Width="300">
+	<StackPanel>
+		<Label Content="時間調整"/>
+		<WrapPanel>
+			<RadioButton x:Name="rbTimeAs" Content="相対時間" GroupName="TimeAs" IsChecked="True"/>
+			<Label/>
+			<RadioButton Content="絶対時間" GroupName="TimeAs"/>
+		</WrapPanel>
+		<DockPanel>
+			<Button Name="btTimeExecute" Content="実行" HorizontalAlignment="Right" DockPanel.Dock="Right" Click="btTimeExecute_Click"/>
+			<WrapPanel>
+				<ComboBox Name="cbTimePM">
+					<ComboBox.ItemContainerStyle>
+						<Style TargetType="ComboBoxItem">
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding IsChecked, ElementName=rbTimeAs}" Value="true">
+									<Setter Property="IsEnabled" Value="True"/>
+								</DataTrigger>
+								<DataTrigger Binding="{Binding IsChecked, ElementName=rbTimeAs}" Value="false">
+									<Setter Property="IsEnabled" Value="False"/>
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</ComboBox.ItemContainerStyle>
+					<ComboBoxItem Content="+" IsSelected="True"/>
+					<ComboBoxItem Content="-"/>
+				</ComboBox>
+				<Label/>
+				<local:NumericUpDown x:Name="nuHour" Value="0" Mininum="0" Maximum="23"/>
+				<Label Content="時"/>
+				<local:NumericUpDown x:Name="nuMinute" Value="0" Mininum="0" Maximum="59"/>
+				<Label Content="分"/>
+				<local:NumericUpDown x:Name="nuSecond" Value="0" Mininum="0" Maximum="59"/>
+				<Label Content="秒"/>
+				<Label/>
+			</WrapPanel>
+		</DockPanel>
+	</StackPanel>
+</Window>

@@ -1,0 +1,284 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data.SQLite;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Collections.ObjectModel;
+using Microsoft.Win32;
+using System.Runtime.Serialization;
+using System.Xml;
+using LogProc.Definitions;
+using LogProc.Interfaces;
+using LogProc.Utilities;
+
+namespace LogProc {
+	public partial class MainWindow : Window {
+		private WorkingData Work { get; set; }
+		private List<InterSet> Intersets { get; set; }
+		private InterSet nowItst { get; set; }
+
+		public MainWindow() {
+			Work = new WorkingData();
+			Work.Log = new ObservableCollection<LogData>();
+
+			InitializeComponent();
+			SetInterset();
+			List<IDefine> defPlugins = new List<IDefine>();
+			foreach(var i in Intersets) defPlugins.Add(i.Def);
+			ConfTab.Plugins = defPlugins.ToArray();
+			dgLog.ItemsSource = Work.Log;
+		}
+
+		private void SetInterset() {
+			Intersets = new List<InterSet>();
+			Intersets.Add(new InterSet() { Def = new ALLJA.ContestDefine(), Sea = new ALLJA.SearchLog(), Sum = new ALLJA.LogSummery() });
+		}
+
+		private void UpdateData() {
+			if(Work.Log.Count == 0) return;
+
+			int unsearchen = 0;
+			int unfinden = 0;
+			int erroren = 0;
+
+			lbReadenLogNum.Content = Work.Log.Count;
+			Work.Log = new ObservableCollection<LogData>(Work.Log.OrderBy(l => l.Date));
+			dgLog.ItemsSource = Work.Log;
+			if(Work.Config != null) lbSettingConfigen.Content = "";
+			foreach(var l in Work.Log) {
+				if(!l.Searchen) unsearchen++;
+				if(!l.Finden) unfinden++;
+				if(!l.Rate0) erroren++;
+			}
+			lbUnsearchenLogNum.Content = unsearchen;
+			lbUnavailenLogNum.Content = unfinden;
+			lbErrorenLogNum.Content = erroren;
+
+
+		}
+
+		private void miAddFile_Click(object sender, RoutedEventArgs e) {
+			LoadLog ll = new LoadLog();
+			if(!ll.AddFiles()) {
+				MessageBox.Show("ファイル読み込みに失敗しました。", "通知");
+				return;
+			}
+			if(ll.ContestLog == null) return;
+			foreach(var ld in ll.ContestLog) {
+				Work.Log.Add(ld);
+			}
+
+			UpdateData();
+		}
+
+		private void miLoadWork_Click(object sender, RoutedEventArgs e) {
+			OpenFileDialog ofd = new OpenFileDialog();
+			ofd.Title = "作業ファイルの読み込み";
+			ofd.Filter = "作業ファイル(*.work.xml)|*.work.xml";
+			if(ofd.ShowDialog() != true) return;
+			DataContractSerializer serial = new DataContractSerializer(typeof(WorkingData));
+			XmlReader xr = XmlReader.Create(ofd.FileName);
+			Work = new WorkingData();
+			Work = (WorkingData)serial.ReadObject(xr);
+			ConfTab.DoLoad(Work.Config);
+			UpdateData();
+			xr.Close();
+		}
+
+		private void miSaveWork_Click(object sender, RoutedEventArgs e) {
+			SaveFileDialog sfd = new SaveFileDialog();
+			sfd.Title = "作業ファイルの保存";
+			sfd.Filter = "作業ファイル(*.work.xml)|*.work.xml";
+			if(sfd.ShowDialog() == true) {
+				string filename = sfd.FileName;
+				DataContractSerializer serial = new DataContractSerializer(typeof(WorkingData));
+				XmlWriterSettings set = new XmlWriterSettings();
+				set.Encoding = new System.Text.UTF8Encoding(false);
+				XmlWriter xw = XmlWriter.Create(filename, set);
+				serial.WriteObject(xw, Work);
+				xw.Close();
+			}
+		}
+
+		private void miExit_Click(object sender, RoutedEventArgs e) {
+			System.Environment.Exit(0);
+		}
+
+		private void dgLog_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e) {
+			DataGrid dg = sender as DataGrid;
+			Point pt = e.GetPosition(dg);
+			DataGridCell dgcell = null;
+
+			VisualTreeHelper.HitTest(dg, null, (result) => {
+				DataGridCell cell = FindVisualParent<DataGridCell>(result.VisualHit);
+				if(cell != null) {
+					dgcell = cell;
+					return HitTestResultBehavior.Stop;
+				} else return HitTestResultBehavior.Continue;
+			}, new PointHitTestParameters(pt));
+
+			if(dgcell == null) return;
+			LogData ld = dgcell.DataContext as LogData;
+			ContextMenu cm = new ContextMenu();
+
+			var datalist = dg.SelectedItems.Cast<LogData>().ToList<LogData>();
+			if(!datalist.Contains(ld)) {
+				dg.SelectedItem = ld;
+			}
+
+			MenuItem mi = new MenuItem();
+			mi.Click += SearchByWeb;
+			mi.Header = "Webで検索(" + ld.CallSign + ")";
+			mi.CommandParameter = defSearch.GetCallSignBesideStroke(ld.CallSign);
+			cm.Items.Add(mi);
+
+			MenuItem miLogEdit = new MenuItem();
+			miLogEdit.Click += EditLog;
+			miLogEdit.Header = "ログ修正";
+
+			if(!datalist.Contains(ld) || datalist.Count == 1) {
+				cm.Items.Add(new Separator());
+				miLogEdit.CommandParameter = new List<LogData>() { ld };
+				cm.Items.Add(miLogEdit);
+			} else {
+				MenuItem miSearches = new MenuItem();
+				miSearches.Click += SearchByWeb;
+				miSearches.Header = "Webで検索(" + datalist.Count + "件)";
+				miSearches.CommandParameter = datalist;
+				cm.Items.Add(miSearches);
+
+				cm.Items.Add(new Separator());
+
+				miLogEdit.CommandParameter = datalist;
+				cm.Items.Add(miLogEdit);
+			}
+
+			ContextMenuService.SetContextMenu(dgcell, cm);
+		}
+
+		private T FindVisualParent<T>(DependencyObject child) where T : DependencyObject {
+			DependencyObject parentobj = VisualTreeHelper.GetParent(child);
+			if(parentobj == null) return null;
+			T parent = parentobj as T;
+			if(parent != null) return parent;
+			else return FindVisualParent<T>(parentobj);
+		}
+
+		private void SearchByWeb(object sender, RoutedEventArgs e) {
+			var cp = (sender as MenuItem).CommandParameter;
+
+			if(cp is string) {
+				AccessStationSearch(cp.ToString());
+			} else if(cp is List<LogData>) {
+				foreach(var ld in cp as List<LogData>) {
+					AccessStationSearch(ld.CallSign);
+				}
+			}
+			//throw new NotImplementedException();
+		}
+
+		private void EditLog(object sender, RoutedEventArgs e) {
+			LogEdit le = new LogEdit((sender as MenuItem).CommandParameter as List<LogData>);
+			le.ShowDialog();
+			UpdateData();
+		}
+
+		private void AccessStationSearch(string CallSign) {
+			System.Diagnostics.Process.Start("http://www.tele.soumu.go.jp/musen/SearchServlet?SC=1&pageID=3&SelectID=1&CONFIRM=0&SelectOW=01&IT=&HC=&HV=&FF=&TF=&HZ=3&NA=&MA=" + defSearch.GetCallSignBesideStroke(CallSign) + "&DFY=&DFM=&DFD=&DTY=&DTM=&DTD=&SK=2&DC=100&as_fid=2I6vX7ugLE0ekrPjPfMD#result");
+		}
+
+		private void SetNowIntersets() {
+			for(int i = 0;i < Intersets.Count;i++) {
+				if(Intersets[i].Def.ContestName == Work.Config.ContestName) {
+					nowItst = Intersets[i];
+					return;
+				}
+			}
+		}
+
+		private void btLoadSetting_Click(object sender, RoutedEventArgs e) {
+			Work.Config = ConfTab.SetSetting();
+			SetNowIntersets();
+            UpdateData();
+		}
+
+		private void btSaveSetting_Click(object sender, RoutedEventArgs e) {
+			Work.Config = ConfTab.SaveSetting();
+			SetNowIntersets();
+			UpdateData();
+		}
+
+		private void btCheck_Click(object sender, RoutedEventArgs e) {
+			Work.Config = ConfTab.GetSetting();
+			SetNowIntersets();
+			UpdateData();
+			if(nowItst == null || Work.Log == null || Work.Log.Count == 0) {
+				MessageBox.Show("チェックするログがない、もしくは局情報等が設定されてません。", "通知");
+				return;
+			}
+			SearchWindow sw = new SearchWindow(Work, nowItst.Sea);
+			sw.ShowDialog();
+			UpdateData();
+			if(ConfTab.cbAutoOperator.IsChecked == true) {
+				ConfTab.tbOperator.Text = SearchUtil.GetOpList(Work);
+				ConfTab.cbAutoOperator.IsChecked = false;
+			}
+		}
+
+		private void btOutput_Click(object sender, RoutedEventArgs e) {
+			Work.Config = ConfTab.GetSetting();
+			SetNowIntersets();
+			UpdateData();
+			if(nowItst == null || Work.Log == null || Work.Log.Count == 0) {
+				MessageBox.Show("チェックするログがない、もしくは局情報等が設定されてません。", "通知");
+				return;
+			}
+			OutputSummery os = new OutputSummery(Work, nowItst.Sum);
+			os.ShowDialog();
+			UpdateData();
+		}
+
+		private void Window_Closed(object sender, EventArgs e) {
+			System.Environment.Exit(0);
+		}
+
+		private void miVersionInfo_Click(object sender, RoutedEventArgs e) {
+			MessageBox.Show("ログ集計支援ソフト（名前はまだない）\r\nVer:0.8.40(rev:18, Build:20151202)\r\nAuthor/Developer: JI1LDG(@Yama_LDG)\r\nForm Designer / Adviser: JI1EPL", "バージョン情報");
+		}
+
+		private void miDBInit_Click(object sender, RoutedEventArgs e) {
+			if(MessageBox.Show("DBの新規作成・初期化を実行しますか？\r\n※必要時以外は実行しないでください。", "警告", MessageBoxButton.YesNo) == MessageBoxResult.Yes) {
+				if(System.IO.File.Exists("RadioStation.db")) {
+					string tm = System.DateTime.Now.ToString("yyMMddHHmmss");
+					var path = System.Environment.CurrentDirectory;
+					System.IO.File.Move(path + "\\RadioStation.db", path + "\\RS" + tm + ".db");
+				}
+				using(var con = new SQLiteConnection()) {
+					con.ConnectionString = "Data Source=RadioStation.db;";
+					con.Open();
+					using(SQLiteCommand com = con.CreateCommand()) {
+						com.CommandText = "create table Stations(callsign TEXT, name TEXT, address  TEXT)";
+						com.ExecuteNonQuery();
+					}
+					con.Close();
+				}
+			}
+		}
+	}
+
+	public class InterSet {
+		public IDefine Def { get; set; }
+		public ISearch Sea { get; set; }
+		public ISummery Sum { get; set; }
+
+		public InterSet() { }
+		public InterSet(IDefine idf, ISearch isa, ISummery ism) {
+			this.Def = idf;
+			this.Sea = isa;
+			this.Sum = ism;
+		}
+	}
+}

@@ -1,0 +1,65 @@
+﻿<Window x:Class="LogProc.Equip"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:local="clr-namespace:LogProc"
+        Title="Equip" Height="400" Width="400">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="1*"/>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="170"/>
+		</Grid.RowDefinitions>
+		<GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" Width="5"/>
+		<DataGrid Name="dgEquip" ItemsSource="{Binding eqp}" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" CanUserAddRows="False" Height="Auto" MinHeight="50" Grid.Row="0" PreviewMouseRightButtonDown="dgEquip_PreviewMouseRightButtonDown">
+			<DataGrid.Columns>
+				<DataGridTemplateColumn IsReadOnly="True" Header="使用">
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<CheckBox IsChecked="{Binding isEquipen, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center" Click="CheckBox_Click">
+							</CheckBox>
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+				<DataGridTextColumn Binding="{Binding Data.Category}" Header="カテゴリ"/>
+				<DataGridTextColumn Binding="{Binding Data.Name}" Header="設備名"/>
+				<DataGridTextColumn Binding="{Binding Data.Rem}" Header="備考"/>
+			</DataGrid.Columns>
+		</DataGrid>
+		<StackPanel Grid.Row="2">
+			<WrapPanel>
+				<Button Content="設備保存" Name="btEqSave" Click="btEqSave_Click"/>
+				<Button Content="設備再読み込み" Name="btEqReload" Click="btEqReload_Click"/>
+			</WrapPanel>
+			<Label/>
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition/>
+					<ColumnDefinition/>
+					<ColumnDefinition/>
+					<ColumnDefinition/>
+				</Grid.ColumnDefinitions>
+				<ComboBox Name="cbCategory" Grid.Column="0">
+					<ComboBoxItem Content="無線機"/>
+					<ComboBoxItem Content="アンテナ"/>
+				</ComboBox>
+				<TextBox Name="tbName" Text="名前" Grid.Column="1" GotFocus="tbName_GotFocus"/>
+				<TextBox Name="tbRem" Text="備考" Grid.Column="2" GotFocus="tbRem_GotFocus"/>
+				<Button Name="btAdd" Content="追加" Grid.Column="3" Click="btAdd_Click"/>
+			</Grid>
+			<CheckBox Content="連続追加" HorizontalAlignment="Right" Name="cbSeqAdd"/>
+			<Label/>
+			<Label Content="プレビュー"/>
+			<TextBox Name="tbPreview" IsEnabled="False"/>
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition/>
+					<ColumnDefinition/>
+				</Grid.ColumnDefinitions>
+				<Button Content="適用して閉じる" Name="btAccept" Grid.Column="0" Click="btAccept_Click"/>
+				<Button Content="適用せずに閉じる" Name="btClose" Grid.Column="1" Click="btClose_Click"/>
+			</Grid>
+		</StackPanel>
+	</Grid>
+</Window>
