@@ -2,14 +2,15 @@
 using LogProc.Definitions;
 using LogProc.Interfaces;
 using LogProc.Utilities;
+
 namespace LogProc {
-	namespace ALLJA {
+	namespace ACAG {
 		public enum defErrorReason {
 			None = 0x00, FailedGetStation = 0x01, ScnError = 0x02, PortableNCN = 0x04, AddressNCN = 0x08, RcnError = 0x10, DavaileCN = 0x40, AnvStation = 0x80, NonAnvStation = 0x0100,
 		}
 
 		public class Property {
-			public static string ContestName { get { return "ALL JAコンテスト"; } }
+			public static string ContestName { get { return "全市全郡コンテスト"; } }
 			public static InterSet Intersets { get { return new InterSet(new ContestDefine(), new SearchLog(), new LogSummery()); } }
 		}
 
@@ -80,6 +81,30 @@ namespace LogProc {
 				Code = "C50",
 			},
 			new CategoryData(){
+				Name = "電信部門シングルオペ144MHzバンド",
+				Code = "C144",
+			},
+			new CategoryData(){
+				Name = "電信部門シングルオペ430MHzバンド",
+				Code = "C430",
+			},
+			new CategoryData(){
+				Name = "電信部門シングルオペ1200MHzバンド",
+				Code = "C1200",
+			},
+			new CategoryData(){
+				Name = "電信部門シングルオペ2400MHzバンド",
+				Code = "C2400",
+			},
+			new CategoryData(){
+				Name = "電信部門シングルオペ5600MHzバンド",
+				Code = "C5600",
+			},
+			new CategoryData(){
+				Name = "電信部門シングルオペ10.1GHzバンド以上",
+				Code = "C10G",
+			},
+			new CategoryData(){
 				Name = "電信部門シングルオペシルバー",
 				Code = "CS",
 			},
@@ -120,6 +145,30 @@ namespace LogProc {
 				Code = "X50",
 			},
 			new CategoryData(){
+				Name = "電信電話部門シングルオペ144MHzバンド",
+				Code = "X144",
+			},
+			new CategoryData(){
+				Name = "電信電話部門シングルオペ430MHzバンド",
+				Code = "X430",
+			},
+			new CategoryData(){
+				Name = "電信電話部門シングルオペ1200MHzバンド",
+				Code = "X1200",
+			},
+			new CategoryData(){
+				Name = "電信電話部門シングルオペ2400MHzバンド",
+				Code = "X2400",
+			},
+			new CategoryData(){
+				Name = "電信電話部門シングルオペ5600MHzバンド",
+				Code = "X5600",
+			},
+			new CategoryData(){
+				Name = "電信電話部門シングルオペ10.1GHzバンド以上",
+				Code = "X10G",
+			},
+			new CategoryData(){
 				Name = "電信電話部門シングルオペシルバー",
 				Code = "XS",
 			},
@@ -146,8 +195,20 @@ namespace LogProc {
 				if(Code[0] == 'P') return ContestPower.TwentyTen;
 				else {
 					switch(Code) {
+						case "C144":
+						case "C430":
+						case "C1200":
+						case "C2400":
+						case "C5600":
+						case "C10G":
 						case "CS":
 						case "CM2":
+						case "X144":
+						case "X430":
+						case "X1200":
+						case "X2400":
+						case "X5600":
+						case "X10G":
 						case "XS":
 						case "XSWL":
 						case "XM2":
@@ -183,14 +244,7 @@ namespace LogProc {
 
 		public class SearchLog : ISearch {
 			private List<Area> _areaData;
-			public List<Area> AreaData {
-				get {
-					if(_areaData == null) {
-						_areaData = SearchUtil.GetAreaListFromFile("Prefectures");
-					}
-					return _areaData;
-				}
-			}
+			public List<Area> AreaData { get { return _areaData; } }
 			public string ContestName { get { return Property.ContestName; } }
 			private LogData _log;
 			public LogData Log {
@@ -220,6 +274,10 @@ namespace LogProc {
 			}
 
 			private defErrorReason _der;
+
+			public SearchLog() {
+				_areaData = SearchUtil.GetAreaListFromFile("ACAG");
+			}
 
 			public void DoCheck() {
 				_der = defErrorReason.None;
@@ -260,7 +318,7 @@ namespace LogProc {
 					_der |= defErrorReason.RcnError;
 				}
 				if(SearchUtil.CallSignIsStroke(Log.CallSign)) {
-					if(SearchUtil.GetAreaNoFromCallSign(Log.CallSign) != SearchUtil.GetAreaNoFromRcn(Log)) {
+					if(SearchUtil.GetAreaNoFromCallSign(Log.CallSign) != SearchUtil.GetAreaNoFromRcnTwoDigits(Log)) {
 						_der |= defErrorReason.PortableNCN;
 					}
 				} else {

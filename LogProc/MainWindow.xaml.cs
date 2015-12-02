@@ -35,6 +35,8 @@ namespace LogProc {
 		private void SetInterset() {
 			Intersets = new List<InterSet>();
 			Intersets.Add(ALLJA.Property.Intersets);
+			Intersets.Add(SixMAndDown.Property.Intersets);
+			Intersets.Add(ACAG.Property.Intersets);
 		}
 
 		private void UpdateData() {
@@ -56,8 +58,6 @@ namespace LogProc {
 			lbUnsearchenLogNum.Content = unsearchen;
 			lbUnavailenLogNum.Content = unfinden;
 			lbErrorenLogNum.Content = erroren;
-
-
 		}
 
 		private void miAddFile_Click(object sender, RoutedEventArgs e) {

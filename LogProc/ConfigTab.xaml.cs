@@ -87,9 +87,16 @@ namespace LogProc {
 					cbCoefficient.IsEnabled = false;
 					cbCoefficient.IsChecked = false;
 				}
+				if(dp.IsSubCN) {
+					tbSubContestNo.IsEnabled = true;
+					tbSubContestNo.Text = st.SubContestNo;
+				} else {
+					tbSubContestNo.IsEnabled = false;
+				}
 				break;
 			}
-			tbContestNo.Text = st.ContestNo;
+			tbMainContestNo.Text = st.ContestNo;
+			tbSubContestNo.Text = st.SubContestNo;
 			rbNormal.IsChecked = st.PowerType == "定格出力" ? true : false;
 			rbReal.IsChecked = rbNormal.IsChecked == true ? false : true;
 			cbPowerValue.Text = st.PowerValue;
@@ -118,12 +125,14 @@ namespace LogProc {
 			foreach(var dp in Plugins) {
 				if(dp.ContestName != st.ContestName) continue;
 				st.CategoryCode = dp.GetCategoryCodeByPower(cbCategory.Text.Substring(1, cbCategory.Text.IndexOf(")") - 1), ConvertCategoryPowerToEnum());
-				break;
+				st.IsSubCN = dp.IsSubCN;
+                break;
 			}
 			st.CategoryName = cbCategory.Text.Substring(cbCategory.Text.IndexOf(")") + 1);
 			st.CategoryPower = ConvertCategoryPowerToStr();
 			st.Coefficient = cbCoefficient.IsChecked == true ? true : false;
-			st.ContestNo = tbContestNo.Text;
+			st.ContestNo = tbMainContestNo.Text;
+			st.SubContestNo = tbSubContestNo.Text;
 			st.PowerType = rbNormal.IsChecked == true ? "定格出力" : "実測出力";
 			st.PowerValue = cbPowerValue.Text;
 			st.AutoOperatorEdit = cbAutoOperator.IsChecked == true ? true : false;
@@ -208,6 +217,11 @@ namespace LogProc {
 				} else {
 					cbCoefficient.IsEnabled = false;
 					cbCoefficient.IsChecked = false;
+				}
+				if(dp.IsSubCN) {
+					tbSubContestNo.IsEnabled = true;
+				} else {
+					tbSubContestNo.IsEnabled = false;
 				}
 				break;
 			}

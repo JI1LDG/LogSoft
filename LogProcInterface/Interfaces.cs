@@ -10,6 +10,7 @@ namespace LogProc {
 		public interface IDefine {
 			string ContestName { get; }
 			bool Coefficient { get; }
+			bool IsSubCN { get; }
 			string Oath { get; }
 			List<CategoryData> ContestCategolies { get; }
 			ContestPower AllowenPowerInCategoryCode(string Code);

@@ -149,6 +149,8 @@ namespace LogProc {
 			public string CategoryPower { get; set; }
 			public bool Coefficient { get; set; }
 			public string ContestNo { get; set; }
+			public string SubContestNo { get; set; }
+			public bool IsSubCN { get; set; }
 			public string PowerType { get; set; }
 			private string _pwvl;
 			public string PowerValue { get { return _pwvl; } set { _pwvl = new Regex(@"[^0-9]").Replace(value, ""); } }
