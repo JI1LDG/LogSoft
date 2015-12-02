@@ -21,7 +21,7 @@
 					</WrapPanel>
 					<Label Content="局種係数"/>
 					<CheckBox Name="cbCoefficient" Content="局種係数2" IsChecked="False" IsEnabled="False"/>
-					<Label Content="コンテストナンバー(RS(T)レポート抜き)"/>
+					<Label Content="コンテストナンバー(RST抜き)"/>
 					<TextBox Name="tbContestNo" CharacterCasing="Upper"/>
 					<Label Content="最大空中線電力"/>
 					<WrapPanel>

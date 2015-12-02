@@ -8,14 +8,16 @@ namespace LogProc {
 			None = 0x00, FailedGetStation = 0x01, ScnError = 0x02, PortableNCN = 0x04, AddressNCN = 0x08, RcnError = 0x10, DavaileCN = 0x40, AnvStation = 0x80, NonAnvStation = 0x0100,
 		}
 
-		public class ALLJA {
+		public class Property {
 			public static string ContestName { get { return "ALL JAコンテスト"; } }
+
+			public static InterSet Intersets { get { return new InterSet(new ContestDefine(), new SearchLog(), new LogSummery()); } }
 		}
 
 		public class ContestDefine : IDefine {
 			public string Oath { get { return "私は，JARL制定のコンテスト規約および電波法令にしたがい運用した結果，ここに提出するサマリーシートおよびログシートなどが事実と相違ないものであることを，私の名誉において誓います。"; } }
 			public bool Coefficient { get { return false; } }
-			public string ContestName { get { return ALLJA.ContestName; } }
+			public string ContestName { get { return Property.ContestName; } }
 			private List<CategoryData> _contestCategolies = new List<CategoryData>() {
 			new CategoryData(){
 				Name = "電話部門シングルオペオールバンド",
@@ -189,7 +191,7 @@ namespace LogProc {
 					return _areaData;
 				}
 			}
-			public string ContestName { get { return ALLJA.ContestName; } }
+			public string ContestName { get { return Property.ContestName; } }
 			private LogData _log;
 			public LogData Log {
 				get { return _log; }
@@ -245,10 +247,11 @@ namespace LogProc {
 			}
 
 			private void CheckScn() {
-				if(!SearchUtil.ContestNoIsWithPower(Log.SendenContestNo) || Log.SendenContestNo != Config.ContestNo) {
+				string chk;
+				if(Log.Mode != "CW") chk = Log.SendenContestNo.Substring(2);
+				else chk = Log.SendenContestNo.Substring(3);
+				if(chk != Config.ContestNo || !SearchUtil.ContestNoIsWithPower(Log.SendenContestNo)) {
 					_der |= defErrorReason.ScnError;
-					Log.ErrorString[0] = Log.SendenContestNo;
-					Log.SendenContestNo = Config.ContestNo;
 				}
 			}
 
@@ -306,7 +309,7 @@ namespace LogProc {
 				}
 
 				if(_der.HasFlag(defErrorReason.ScnError)) {
-					err += "Lv.1:自局コンテストナンバーが不正でした。(" + Log.ErrorString[0] + ")修正済みです。\r\n";
+					err += "Lv.1:自局コンテストナンバーが不正です。\r\n";
 				}
 
 				if(_der.HasFlag(defErrorReason.AnvStation)) {
@@ -317,7 +320,7 @@ namespace LogProc {
 		}
 
 		public class LogSummery : ISummery {
-			public string ContestName { get { return ALLJA.ContestName; } }
+			public string ContestName { get { return Property.ContestName; } }
 			private Setting _config;
 			public Setting Config {
 				get { return _config; }

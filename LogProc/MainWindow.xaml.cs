@@ -34,7 +34,7 @@ namespace LogProc {
 
 		private void SetInterset() {
 			Intersets = new List<InterSet>();
-			Intersets.Add(new InterSet() { Def = new ALLJA.ContestDefine(), Sea = new ALLJA.SearchLog(), Sum = new ALLJA.LogSummery() });
+			Intersets.Add(ALLJA.Property.Intersets);
 		}
 
 		private void UpdateData() {
