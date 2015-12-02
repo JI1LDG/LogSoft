@@ -42,6 +42,14 @@ namespace LogProc {
 			return DoSave();
 		}
 
+		public Setting SetSetting(string Path) {
+			System.Xml.Serialization.XmlSerializer serial = new System.Xml.Serialization.XmlSerializer(typeof(Setting));
+			System.IO.StreamReader sr = new System.IO.StreamReader(Path, new System.Text.UTF8Encoding(false));
+			DoLoad((Setting)serial.Deserialize(sr));
+			sr.Close();
+			return DoSave();
+		}
+
 		public Setting GetSetting() {
 			Setting config;
 

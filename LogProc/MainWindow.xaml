@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:tu="clr-namespace:LogProc"
 		Closed="Window_Closed"
+		AllowDrop="True" Drop="Window_Drop" PreviewDragOver="Window_PreviewDragOver"
         Title="ログ集計支援ソフト(Ver:0.8.40)" Height="500" Width="700">
 	<DockPanel>
 		<Menu DockPanel.Dock="Top">

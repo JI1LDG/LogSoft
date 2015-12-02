@@ -267,6 +267,40 @@ namespace LogProc {
 				}
 			}
 		}
+
+		private void Window_Drop(object sender, DragEventArgs e) {
+			string[] files = e.Data.GetData(DataFormats.FileDrop) as string[];
+			if(files != null) {
+				foreach(var f in files) {
+					if(f.Substring(f.Length - 7) == "set.xml") {
+						ConfTab.SetSetting(f);
+						break;
+					} else if(f.Substring(f.Length - 3) == "lg8" || f.Substring(f.Length - 3) == "txt") {
+						LoadLog ll = new LoadLog();
+						if(!ll.AddFile(f)) {
+							MessageBox.Show("ファイル読み込みに失敗しました。", "通知");
+							return;
+						}
+						if(ll.ContestLog == null) return;
+						if(Work.Log == null) Work.Log = new ObservableCollection<LogData>();
+						foreach(var ld in ll.ContestLog) {
+							Work.Log.Add(ld);
+						}
+
+						UpdateData();
+					}
+				}
+			}
+		}
+
+		private void Window_PreviewDragOver(object sender, DragEventArgs e) {
+			if(e.Data.GetDataPresent(DataFormats.FileDrop, true)) {
+				e.Effects = DragDropEffects.Copy;
+			} else {
+				e.Effects = DragDropEffects.None;
+			}
+			e.Handled = true;
+		}
 	}
 
 	public class InterSet {

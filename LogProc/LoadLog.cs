@@ -18,7 +18,7 @@ namespace LogProc {
 			_ContestLog = new List<LogData>();
 		}
 
-		private bool AddFile(string filePath) {
+		public bool AddFile(string filePath) {
 			List<LogData> tmp = new List<LogData>();
 			if((tmp = LogFormat.GetCTESTWINLogList(filePath)) == null)
 				if((tmp = LogFormat.GetZLOGTXTLogList(filePath)) == null) return false;
