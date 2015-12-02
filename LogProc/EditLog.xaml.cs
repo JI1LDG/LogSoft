@@ -30,5 +30,14 @@ namespace LogProc {
 			}
 			this.Close();
 		}
+
+		private void btEditLogExecute_Click(object sender, RoutedEventArgs e) { 
+			foreach(var l in Log) {
+				if(tbSendenCN.Text != null && tbSendenCN.Text != "") {
+					l.SendenContestNo = tbSendenCN.Text;
+				}
+			}
+			this.Close();
+		}
 	}
 }
