@@ -4,45 +4,25 @@ using LogProc.Interfaces;
 using LogProc.Utilities;
 
 namespace LogProc {
-	namespace ACAG {
+	namespace FieldDay {
 		public enum defErrorReason {
 			None = 0x00, FailedGetStation = 0x01, ScnError = 0x02, PortableNCN = 0x04, AddressNCN = 0x08, RcnError = 0x10, DavaileCN = 0x40, AnvStation = 0x80, NonAnvStation = 0x0100,
 		}
 
 		public class Property {
-			public static string ContestName { get { return "全市全郡コンテスト"; } }
+			public static string ContestName { get { return "フィールドデーコンテスト"; } }
 			public static InterSet Intersets { get { return new InterSet(new ContestDefine(), new SearchLog(), new LogSummery()); } }
 		}
 
 		public class ContestDefine : IDefine {
 			public string Oath { get { return "私は，JARL制定のコンテスト規約および電波法令にしたがい運用した結果，ここに提出するサマリーシートおよびログシートなどが事実と相違ないものであることを，私の名誉において誓います。"; } }
-			public bool Coefficient { get { return false; } }
-			public bool IsSubCN { get { return false; } }
+			public bool Coefficient { get { return true; } }
+			public bool IsSubCN { get { return true; } }
 			public string ContestName { get { return Property.ContestName; } }
 			private List<CategoryData> _contestCategolies = new List<CategoryData>() {
 			new CategoryData(){
 				Name = "電話部門シングルオペオールバンド",
 				Code = "PA",
-			},
-			new CategoryData(){
-				Name = "電話部門シングルオペ3.5MHzバンド",
-				Code = "P35",
-			},
-			new CategoryData(){
-				Name = "電話部門シングルオペ7MHzバンド",
-				Code = "P7",
-			},
-			new CategoryData(){
-				Name = "電話部門シングルオペ21MHzバンド",
-				Code = "P21",
-			},
-			new CategoryData(){
-				Name = "電話部門シングルオペ28MHzバンド",
-				Code = "P28",
-			},
-			new CategoryData(){
-				Name = "電話部門シングルオペ50MHzバンド",
-				Code = "P50",
 			},
 			new CategoryData(){
 				Name = "電話部門シングルオペニューカマー",
@@ -109,6 +89,14 @@ namespace LogProc {
 				Code = "CS",
 			},
 			new CategoryData(){
+				Name = "電信部門シングルオペQRP",
+				Code ="CP",
+			},
+			new CategoryData(){
+				Name = "電信部門シングルオペオールバンドモーニング",
+				Code ="CAR",
+			},
+			new CategoryData(){
 				Name = "電信部門マルチオペオールバンド",
 				Code = "CMA",
 			},
@@ -173,6 +161,10 @@ namespace LogProc {
 				Code = "XS",
 			},
 			new CategoryData(){
+				Name = "電信電話部門シングルオペQRP",
+				Code = "XP",
+			},
+			new CategoryData(){
 				Name = "電信電話部門シングルオペSWL",
 				Code = "XSWL",
 			},
@@ -194,57 +186,24 @@ namespace LogProc {
 			public ContestPower AllowenPowerInCategoryCode(string Code) {
 				if(Code[0] == 'P') return ContestPower.TwentyTen;
 				else {
-					switch(Code) {
-						case "C144":
-						case "C430":
-						case "C1200":
-						case "C2400":
-						case "C5600":
-						case "C10G":
-						case "CS":
-						case "CM2":
-						case "X144":
-						case "X430":
-						case "X1200":
-						case "X2400":
-						case "X5600":
-						case "X10G":
-						case "XS":
-						case "XSWL":
-						case "XM2":
-						case "XMJ":
-							return ContestPower.License;
-						case "CMA":
-						case "XMA":
-							return ContestPower.License | ContestPower.Hundred;
-						default:
-							return ContestPower.License | ContestPower.Hundred | ContestPower.Five;
-					}
+					if(Code == "CP" || Code == "XP") return ContestPower.Five;
+					else return ContestPower.License;
 				}
 			}
 
 			public string GetCategoryCodeByPower(string Code, ContestPower Power) {
-				if(Power.HasFlag(ContestPower.TwentyTen) || AllowenPowerInCategoryCode(Code) == ContestPower.License)
-					return Code;
-				else {
-					if(Power.HasFlag(ContestPower.License)) return Code + "H";
-					else if(Power.HasFlag(ContestPower.Hundred)) return Code + "M";
-					else return Code + "P";
-				}
+				return Code;
 			}
 
 			public string GetCategoryCodeDivPower(string Code, ContestPower Power) {
-				if(Power.HasFlag(ContestPower.TwentyTen) || AllowenPowerInCategoryCode(Code) == ContestPower.License)
-					return Code;
-				else {
-					return Code.Substring(0, Code.Length - 1);
-				}
+				return Code;
 			}
 		}
 
 		public class SearchLog : ISearch {
 			private List<Area> _areaData;
 			public List<Area> AreaData { get { return _areaData; } }
+			public List<Area> ACAGAreaData;
 			public string ContestName { get { return Property.ContestName; } }
 			private LogData _log;
 			public LogData Log {
@@ -276,7 +235,8 @@ namespace LogProc {
 			private defErrorReason _der;
 
 			public SearchLog() {
-				_areaData = SearchUtil.GetAreaListFromFile("ACAG");
+				_areaData = SearchUtil.GetAreaListFromFile("Prefectures");
+				ACAGAreaData = SearchUtil.GetAreaListFromFile("ACAG");
 			}
 
 			public void DoCheck() {
@@ -323,13 +283,16 @@ namespace LogProc {
 				if(!SearchUtil.ContestNoIsWithPower(Log.ReceivenContestNo)) {
 					_der |= defErrorReason.RcnError;
 				}
+				if(Config.Coefficient) Log.Point = 2;
+				else Log.Point = 1;
+
 				if(SearchUtil.CallSignIsStroke(Log.CallSign)) {
-					if(SearchUtil.GetAreaNoFromCallSign(Log.CallSign) != SearchUtil.GetAreaNoFromRcnTwoDigits(Log)) {
+					if(SearchUtil.GetAreaNoFromCallSign(Log.CallSign) != SearchUtil.GetAreaNoFromRcn(Log)) {
 						_der |= defErrorReason.PortableNCN;
 					}
 				} else {
 					List<string> address;
-					if((address = SearchUtil.GetAddressListFromContestAreaNo(AreaData, Station, Log, SearchUtil.GetContestAreaNoFromRcnWithPower(Log))) == null) {
+					if((address = SearchUtil.GetAddressListFromContestAreaNo((defCTESTWIN.GetFreqNum(Log.Frequency) >= 13 ? ACAGAreaData : AreaData), Station, Log, SearchUtil.GetContestAreaNoFromRcnWithPower(Log))) == null) {
 						_der |= defErrorReason.DavaileCN;
 						return;
 					}
@@ -339,7 +302,7 @@ namespace LogProc {
 							if(sa.Contains(adr)) return;
 						}
 					}
-					string ganfa = SearchUtil.GetAreaNoFromAddress(Station, AreaData);
+					string ganfa = SearchUtil.GetAreaNoFromAddress(Station, (defCTESTWIN.GetFreqNum(Log.Frequency) >= 13 ? ACAGAreaData : AreaData));
 					if(ganfa != null) Log.ErrorString[1] = ganfa;
 					_der |= defErrorReason.AddressNCN;
 				}

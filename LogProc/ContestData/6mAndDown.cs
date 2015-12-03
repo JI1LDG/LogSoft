@@ -212,7 +212,13 @@ namespace LogProc {
 				string chk;
 				if(Log.Mode != "CW") chk = Log.SendenContestNo.Substring(2);
 				else chk = Log.SendenContestNo.Substring(3);
-				if(chk != (Config.IsSubCN ? Config.SubContestNo : Config.ContestNo) || !SearchUtil.ContestNoIsWithPower(Log.SendenContestNo)) {
+				string cn;
+				if(Config.IsSubCN && defCTESTWIN.GetFreqNum(Log.Frequency) >= 13) {
+					cn = Config.SubContestNo;
+				} else {
+					cn = Config.ContestNo;
+				}
+				if(chk != cn || !SearchUtil.ContestNoIsWithPower(Log.SendenContestNo)) {
 					_der |= defErrorReason.ScnError;
 				}
 			}
