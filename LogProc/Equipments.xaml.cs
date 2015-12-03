@@ -54,7 +54,7 @@ namespace LogProc {
 			gEquip = new ObservableCollection<EquipGrid>();
 			eqp = new List<EquipData>();
 			try {
-				using(var str = new StreamReader(@"Equipments.xml")) {
+				using(var str = new StreamReader(@"data/Equipments.xml")) {
 					var xr = XmlReader.Create(str, new XmlReaderSettings() { IgnoreWhitespace = true, });
 					var e = new EquipData();
 					while(xr.Read()) {

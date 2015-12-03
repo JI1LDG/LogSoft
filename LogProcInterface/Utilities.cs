@@ -108,7 +108,7 @@ namespace LogProc {
 			}
 
 			public static List<Area> GetAreaListFromFile(string AreaFileName) {
-				System.IO.StreamReader sr = new System.IO.StreamReader(AreaFileName + ".area.txt", System.Text.Encoding.Default);
+				System.IO.StreamReader sr = new System.IO.StreamReader("data/" + AreaFileName + ".area.txt", System.Text.Encoding.Default);
 				var AreaData = new List<Area>();
 				while(sr.Peek() > 0) {
 					string buf = sr.ReadLine();
@@ -188,7 +188,7 @@ namespace LogProc {
 			public static string Get8JStationDataFromFile() {
 				System.IO.StreamReader sr;
 				try {
-					sr = new System.IO.StreamReader("8JStation.txt", System.Text.Encoding.Default);
+					sr = new System.IO.StreamReader("data/8JStation.txt", System.Text.Encoding.Default);
 				}catch(System.IO.FileNotFoundException e) {
 					System.Console.WriteLine(e.Message);
 					return null;

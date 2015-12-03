@@ -106,17 +106,6 @@ namespace LogProc {
 			sr.Close();
 		}
 
-		public static string GetContestAkaName(string name) {
-			switch(name) {
-				case "ALL JAコンテスト": return "ALJA";
-				case "オール神奈川コンテスト": return "AKNG";
-				case "6m AND DOWNコンテスト": return "6MAD";
-				case "フィールドデーコンテスト": return "FLDD";
-				case "全市全郡コンテスト": return "ACAG";
-				default: return "";
-			}
-		}
-
 		public void DoAbort() {
 			Abort = true;
 		}
@@ -207,7 +196,7 @@ namespace LogProc {
 
 			private StationData SearchDetailFromDB() {
 				StationData sd = new StationData();
-				using(var connect = new SQLiteConnection("Data Source=RadioStation.db")) {
+				using(var connect = new SQLiteConnection("Data Source=data/RadioStation.db")) {
 					connect.Open();
 					using(SQLiteCommand command = connect.CreateCommand()) {
 						command.CommandText = "select * from Stations where callsign = '" + callsign + "'";
@@ -229,7 +218,7 @@ namespace LogProc {
 			}
 
 			private void InsertStationData(StationData sd) {
-				using(var connect = new SQLiteConnection("Data Source=RadioStation.db")) {
+				using(var connect = new SQLiteConnection("Data Source=data/RadioStation.db")) {
 					connect.Open();
 					using(SQLiteTransaction sqlt = connect.BeginTransaction()) {
 						using(SQLiteCommand command = connect.CreateCommand()) {

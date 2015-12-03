@@ -246,18 +246,18 @@ namespace LogProc {
 		}
 
 		private void miVersionInfo_Click(object sender, RoutedEventArgs e) {
-			MessageBox.Show("ログ集計支援ソフト（名前はまだない）\r\nVer:0.8.40(rev:18, Build:20151202)\r\nAuthor/Developer: JI1LDG(@Yama_LDG)\r\nForm Designer / Adviser: JI1EPL", "バージョン情報");
+			MessageBox.Show("ログ集計支援ソフト（名前はまだない）\r\nVer:0.8.41(rev:19, Build:20151203)\r\nAuthor/Developer: JI1LDG(@Yama_LDG)\r\nForm Designer / Adviser: JI1EPL", "バージョン情報");
 		}
 
 		private void miDBInit_Click(object sender, RoutedEventArgs e) {
 			if(MessageBox.Show("DBの新規作成・初期化を実行しますか？\r\n※必要時以外は実行しないでください。", "警告", MessageBoxButton.YesNo) == MessageBoxResult.Yes) {
-				if(System.IO.File.Exists("RadioStation.db")) {
+				if(System.IO.File.Exists("data/RadioStation.db")) {
 					string tm = System.DateTime.Now.ToString("yyMMddHHmmss");
 					var path = System.Environment.CurrentDirectory;
-					System.IO.File.Move(path + "\\RadioStation.db", path + "\\RS" + tm + ".db");
+					System.IO.File.Move(path + "/data/RadioStation.db", path + "/data/RS" + tm + ".db");
 				}
 				using(var con = new SQLiteConnection()) {
-					con.ConnectionString = "Data Source=RadioStation.db;";
+					con.ConnectionString = "Data Source=data/RadioStation.db;";
 					con.Open();
 					using(SQLiteCommand com = con.CreateCommand()) {
 						com.CommandText = "create table Stations(callsign TEXT, name TEXT, address  TEXT)";
