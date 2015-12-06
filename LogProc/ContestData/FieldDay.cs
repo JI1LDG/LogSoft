@@ -283,8 +283,6 @@ namespace LogProc {
 				if(!SearchUtil.ContestNoIsWithPower(Log.ReceivenContestNo)) {
 					_der |= defErrorReason.RcnError;
 				}
-				if(Config.Coefficient) Log.Point = 2;
-				else Log.Point = 1;
 
 				if(SearchUtil.CallSignIsStroke(Log.CallSign)) {
 					if(SearchUtil.GetAreaNoFromCallSign(Log.CallSign) != SearchUtil.GetAreaNoFromRcn(Log)) {
@@ -353,7 +351,7 @@ namespace LogProc {
 				get { return _config; }
 				set { _config = value; }
 			}
-			public bool isEditenScore { get { return false; } }
+			public bool isEditenScore { get { return true; } }
 			private List<Multiply> _multi;
 			public List<Multiply> Multi {
 				get { return _multi; }
@@ -375,7 +373,36 @@ namespace LogProc {
 			}
 
 			public string GetScoreStr() {
-				return null;
+				string output = "";
+				int totalLog = 0;
+				int totalPts = 0;
+				int totalMulti = 0;
+				for(int i = 0;i < FreqNum;i++) {
+					int multiNum = 0;
+					int logNum = 0;
+					int ptsNum = 0;
+					foreach(var m in Multi) {
+						if(m.Frequency != i) continue;
+						multiNum++;
+						logNum += m.Num;
+						ptsNum += m.Point;
+					}
+					if(multiNum == 0) continue;
+					output += "<SCORE BAND=" + defCTESTWIN.GetFreqString((defCTESTWIN.FreqStr)i) + ">";
+					output += logNum + "," + ptsNum + "," + multiNum + "</SCORE>\r\n";
+					totalLog += logNum;
+					totalPts += ptsNum;
+					totalMulti += multiNum;
+				}
+				if(totalLog == 0) return "";
+				int coeff;
+				if(Config.Coefficient) coeff = 2;
+				else coeff = 1;
+				output += "<SCORE BAND=TOTAL>" + totalLog + "," + totalPts + "," + totalMulti + "</SCORE>\r\n";
+				output += "<FDCOEFF>" + coeff + "</FDCOEFF>\r\n";
+				output += "<TOTALSCORE>" + totalPts * totalMulti * coeff + "</TOTALSCORE>\r\n";
+				return output;
+
 			}
 		}
 	}
