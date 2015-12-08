@@ -157,7 +157,7 @@ namespace LogProc {
 				}
 				string ganfa = GetContestAreaNoFromStationData(Station, AreaData);
 				if(ganfa != "") {
-					Log.ErrorString[2] = ganfa;
+					Log.ErrorString = ganfa;
 				}
 				return null;
 			}

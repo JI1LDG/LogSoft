@@ -301,7 +301,7 @@ namespace LogProc {
 						}
 					}
 					string ganfa = SearchUtil.GetAreaNoFromAddress(Station, (defCTESTWIN.GetFreqNum(Log.Frequency) >= 13 ? ACAGAreaData : AreaData));
-					if(ganfa != null) Log.ErrorString[1] = ganfa;
+					if(ganfa != null) Log.ErrorString = ganfa;
 					_der |= defErrorReason.AddressNCN;
 				}
 			}
@@ -311,12 +311,12 @@ namespace LogProc {
 
 				if(_der.HasFlag(defErrorReason.DavaileCN)) {
 					err += "Lv.5:コンテストナンバーと対応する、地域番号が存在しません。\r\n";
-					if(Log.ErrorString[2] != "") err += "もしかして:" + Log.ErrorString[2] + "\r\n";
+					if(Log.ErrorString != "") err += "もしかして:" + Log.ErrorString + "\r\n";
 				}
 
 				if(_der.HasFlag(defErrorReason.AddressNCN)) {
 					err += "Lv.4:無線局常置場所とコンテストナンバーが一致しません。\r\n";
-					if(Log.ErrorString[1] != "") err += "もしかして:" + Log.ErrorString[1] + "\r\n";
+					if(Log.ErrorString != "") err += "もしかして:" + Log.ErrorString + "\r\n";
 				}
 				if(_der.HasFlag(defErrorReason.PortableNCN)) {
 					err += "Lv.4:移動エリアとコンテストナンバーが一致しません。\r\n";

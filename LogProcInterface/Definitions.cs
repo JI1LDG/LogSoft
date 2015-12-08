@@ -7,9 +7,6 @@ using LogProc.Interfaces;
 
 namespace LogProc {
 	namespace Definitions {
-		public enum defError {
-			None = 0x00, FailedGetStation = 0x01, MyCNError = 0x02, PortableNCN = 0x04, AddressNCN = 0x08, UrCNError = 0x10, RSNot59 = 0x20, DavaileCN = 0x40, AnvStation = 0x80, NonAnvStation = 0x0100,
-		}
 		public static class defCTESTWIN {
 			public enum ModeStr {
 				CW, RTTY, SSB, FM, AM,
@@ -105,7 +102,7 @@ namespace LogProc {
 					}
 				}
 			}
-			public string[] ErrorString;
+			public string ErrorString;
 			public bool Rate5 { get { return this.FailedStr.Contains("Lv.5"); } }
 			public bool Rate4 { get { return this.FailedStr.Contains("Lv.4"); } }
 			public bool Rate3 { get { return this.FailedStr.Contains("Lv.3"); } }
