@@ -197,18 +197,9 @@ namespace LogProc {
 			public List<Area> AreaData {
 				get {
 					if (_areaData == null) {
-						_areaData = SearchUtil.GetAreaListFromFile("Prefectures");
+						_areaData = SearchUtil.GetAreaListFromFile("AllKanagawa");
 					}
 					return _areaData;
-				}
-			}
-			private List<Area> _ACAGareaData;
-			public List<Area> ACAGAreaData {
-				get {
-					if (_ACAGareaData == null) {
-						_ACAGareaData = SearchUtil.GetAreaListFromFile("ACAG");
-					}
-					return _ACAGareaData;
 				}
 			}
 			public string ContestName { get { return Property.ContestName; } }
@@ -299,7 +290,7 @@ namespace LogProc {
 						ErrorReason.SetError(_er, "UnmatchedCnWithPortable");
 					}
 				} else {
-					var address = SearchUtil.GetAddressListOrSuggestFromContestAreaNo((SearchUtil.GetContestAreaNoFromRcnDisPower(Log).Length > 3 ? ACAGAreaData : AreaData), Station, Log, SearchUtil.GetContestAreaNoFromRcnDisPower(Log));
+					var address = SearchUtil.GetAddressListOrSuggestFromContestAreaNo(AreaData, Station, Log, SearchUtil.GetContestAreaNoFromRcnDisPower(Log));
 					if (address is string) {
 						ErrorReason.SetError(_er, "UnexistedAreanoWithCn", address as string);
 						return;
@@ -310,7 +301,7 @@ namespace LogProc {
 							if (sa.Contains(adr)) return;
 						}
 					}
-					string ganfa = SearchUtil.GetAreaNoFromAddress(Station, (defCTESTWIN.GetFreqNum(Log.Frequency) >= 13 ? ACAGAreaData : AreaData));
+					string ganfa = SearchUtil.GetAreaNoFromAddress(Station, AreaData);
 					ErrorReason.SetError(_er, "UnmatchedCnWithAddress", ganfa);
 				}
 			}
