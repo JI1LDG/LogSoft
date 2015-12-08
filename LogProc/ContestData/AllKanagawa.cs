@@ -5,11 +5,6 @@ using LogProc.Utilities;
 
 namespace LogProc {
 	namespace AllKanagawa {
-		public enum defErrorReason {
-			None = 0x00, FailedGetStation = 0x01, ScnError = 0x02, PortableNCN = 0x04, AddressNCN = 0x08, RcnError = 0x10, DavaileCN = 0x40, AnvStation = 0x80, NonAnvStation = 0x0100,
-			NotInKanagawa = 0x0200,
-		}
-
 		public class Property {
 			public static string ContestName { get { return "オール神奈川コンテスト"; } }
 			public static InterSet Intersets { get { return new InterSet(new ContestDefine(), new SearchLog(), new LogSummery()); } }
@@ -199,8 +194,23 @@ namespace LogProc {
 
 		public class SearchLog : ISearch {
 			private List<Area> _areaData;
-			public List<Area> AreaData { get { return _areaData; } }
-			public List<Area> ACAGAreaData;
+			public List<Area> AreaData {
+				get {
+					if (_areaData == null) {
+						_areaData = SearchUtil.GetAreaListFromFile("Prefectures");
+					}
+					return _areaData;
+				}
+			}
+			private List<Area> _ACAGareaData;
+			public List<Area> ACAGAreaData {
+				get {
+					if (_ACAGareaData == null) {
+						_ACAGareaData = SearchUtil.GetAreaListFromFile("ACAG");
+					}
+					return _ACAGareaData;
+				}
+			}
 			public string ContestName { get { return Property.ContestName; } }
 			private LogData _log;
 			public LogData Log {
@@ -224,19 +234,18 @@ namespace LogProc {
 			}
 			public bool isErrorAvailable {
 				get {
-					if(_der == defErrorReason.None || _der == defErrorReason.AnvStation) return false;
-					else return true;
+					foreach (var e in _er) {
+						if (e.IsSet) return true;
+					}
+					return false;
 				}
 			}
 
-			private defErrorReason _der;
-
-			public SearchLog() {
-				_areaData = SearchUtil.GetAreaListFromFile("AllKanagawa");
-			}
+			private List<ErrorReason> _er;
 
 			public void DoCheck() {
-				_der = defErrorReason.None;
+				_er = ErrorReason.GetInitial();
+				ErrorReason.PutError(_er, new ErrorReason(5, "NotInKanagawa", "神奈川県内の局ではありません。無効です。"));
 				CheckAnv();
 				CheckStationAvailable();
 				CheckScn();
@@ -245,106 +254,69 @@ namespace LogProc {
 			}
 
 			private void CheckAnv() {
-				if(Log.CallSign[0] != '8') return;
+				if (Log.CallSign[0] != '8') return;
 				string cs = defSearch.GetCallSignBesideStroke(Log.CallSign);
-				if(AnvStation.Contains(cs)) {
-					_der |= defErrorReason.AnvStation;
-				} else {
-					_der |= defErrorReason.NonAnvStation;
+				if (!AnvStation.Contains(cs)) {
+					ErrorReason.SetError(_er, "CannotConfirmAnvsta");
 				}
 			}
 
 			private void CheckStationAvailable() {
-				if(Station == null && Log.CallSign[0] != '8') {
-					_der |= defErrorReason.FailedGetStation;
+				if (Station == null && Log.CallSign[0] != '8') {
+					ErrorReason.SetError(_er, "FailedToGetData");
 				}
 			}
 
 			private void CheckScn() {
 				string chk;
-				if(Log.Mode != "CW") chk = Log.SendenContestNo.Substring(2);
+				if (Log.Mode != "CW") chk = Log.SendenContestNo.Substring(2);
 				else chk = Log.SendenContestNo.Substring(3);
 				string cn;
-				if(Config.IsSubCN && defCTESTWIN.GetFreqNum(Log.Frequency) >= 13) {
+				if (Config.IsSubCN && defCTESTWIN.GetFreqNum(Log.Frequency) >= 13) {
 					cn = Config.SubContestNo;
 				} else {
 					cn = Config.ContestNo;
 				}
-				if(chk != cn || SearchUtil.ContestNoIsWithPower(Log.SendenContestNo)) {
-					_der |= defErrorReason.ScnError;
+				if (chk != cn || SearchUtil.ContestNoIsWithPower(Log.SendenContestNo)) {
+					ErrorReason.SetError(_er, "InvalidSentCn");
 				}
 			}
 
 			private void CheckRcn() {
-				if(SearchUtil.ContestNoIsWithPower(Log.ReceivenContestNo)) {
-					_der |= defErrorReason.RcnError;
+				if (SearchUtil.ContestNoIsWithPower(Log.ReceivenContestNo)) {
+					ErrorReason.SetError(_er, "InvalidReceivedCn");
 				}
-				if(Config.CategoryCode[0] == 'X' && SearchUtil.GetPrefNoFromRcn(Log) != "11") {
-					_der |= defErrorReason.NotInKanagawa;
+
+				if (Config.CategoryCode[0] == 'X' && SearchUtil.GetPrefNoFromRcn(Log) != "11") {
+					ErrorReason.SetError(_er, "NotInKanagawa");
 					Log.Point = 0;
 				} else Log.Point = 1;
+
 				if(SearchUtil.CallSignIsStroke(Log.CallSign)) {
 					int RcnAreano = SearchUtil.GetAreaNoFromRcn(Log);
 					if(RcnAreano == -1) RcnAreano = 1;
                     if(SearchUtil.GetAreaNoFromCallSign(Log.CallSign) != RcnAreano) {
-						_der |= defErrorReason.PortableNCN;
+						ErrorReason.SetError(_er, "UnmatchedCnWithPortable");
 					}
 				} else {
-					List<string> address;
-					if((address = SearchUtil.GetAddressListFromContestAreaNo(AreaData, Station, Log, SearchUtil.GetContestAreaNoFromRcnDisPower(Log))) == null) {
-						_der |= defErrorReason.DavaileCN;
+					var address = SearchUtil.GetAddressListOrSuggestFromContestAreaNo((SearchUtil.GetContestAreaNoFromRcnDisPower(Log).Length > 3 ? ACAGAreaData : AreaData), Station, Log, SearchUtil.GetContestAreaNoFromRcnDisPower(Log));
+					if (address is string) {
+						ErrorReason.SetError(_er, "UnexistedAreanoWithCn", address as string);
 						return;
 					}
-					if(Station == null) return;
-					foreach(var adr in address) {
-						foreach(var sa in SearchUtil.GetAddressListFromStationData(Station)) {
-							if(sa.Contains(adr)) return;
+					if (Station == null) return;
+					foreach (var adr in address as List<string>) {
+						foreach (var sa in SearchUtil.GetAddressListFromStationData(Station)) {
+							if (sa.Contains(adr)) return;
 						}
 					}
-					string ganfa = SearchUtil.GetAreaNoFromAddress(Station, AreaData);
-					if(ganfa != null) Log.ErrorString = ganfa;
-					_der |= defErrorReason.AddressNCN;
+					string ganfa = SearchUtil.GetAreaNoFromAddress(Station, (defCTESTWIN.GetFreqNum(Log.Frequency) >= 13 ? ACAGAreaData : AreaData));
+					ErrorReason.SetError(_er, "UnmatchedCnWithAddress", ganfa);
 				}
 			}
 
 			public void SetErrorStr() {
-				string err = "";
-
-				if(_der.HasFlag(defErrorReason.DavaileCN)) {
-					err += "Lv.5:コンテストナンバーと対応する、地域番号が存在しません。\r\n";
-					if(Log.ErrorString != "") err += "もしかして:" + Log.ErrorString + "\r\n";
-				}
-				if(_der.HasFlag(defErrorReason.NotInKanagawa)) {
-					err += "Lv.5:神奈川県内の局ではありません。無効です。\r\n";
-				}
-
-				if(_der.HasFlag(defErrorReason.AddressNCN)) {
-					err += "Lv.4:無線局常置場所とコンテストナンバーが一致しません。\r\n";
-					if(Log.ErrorString != "") err += "もしかして:" + Log.ErrorString + "\r\n";
-				}
-				if(_der.HasFlag(defErrorReason.PortableNCN)) {
-					err += "Lv.4:移動エリアとコンテストナンバーが一致しません。\r\n";
-				}
-
-				if(_der.HasFlag(defErrorReason.RcnError)) {
-					err += "Lv.3:相手局コンテストナンバーが不正です。\r\n";
-				}
-				if(_der.HasFlag(defErrorReason.FailedGetStation)) {
-					err += "Lv.3:データ取得失敗しました。手動で調べてください。\r\n";
-				}
-
-				if(_der.HasFlag(defErrorReason.NonAnvStation)) {
-					err += "Lv.2:記念局確認ができませんでした。\r\n";
-				}
-
-				if(_der.HasFlag(defErrorReason.ScnError)) {
-					err += "Lv.1:自局コンテストナンバーが不正です。\r\n";
-				}
-
-				if(_der.HasFlag(defErrorReason.AnvStation)) {
-					err += "Lv.0:記念局です。\r\n";
-				}
-				Log.FailedStr = err;
+				Log.FailedStr = ErrorReason.GetFailedStr(_er);
 			}
 		}
 

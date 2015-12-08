@@ -248,7 +248,7 @@ namespace LogProc {
 		}
 
 		private void miVersionInfo_Click(object sender, RoutedEventArgs e) {
-			MessageBox.Show("ログ集計支援ソフト（名前はまだない）\r\nVer:0.8.42(rev:20, Build:20151206)\r\nAuthor/Developer: JI1LDG(@Yama_LDG)\r\nForm Designer / Adviser: JI1EPL\r\n無線局情報の検索に総務省の「無線局等情報検索(http://www.tele.soumu.go.jp/musen/SearchServlet?pageID=1)」を使用しています。", "バージョン情報");
+			MessageBox.Show("ログ集計支援ソフト（名前はまだない）\r\nVer:0.8.43(rev:21, Build:20151209)\r\nAuthor/Developer: JI1LDG(@Yama_LDG)\r\nForm Designer / Adviser: JI1EPL\r\n無線局情報の検索に総務省の「無線局等情報検索(http://www.tele.soumu.go.jp/musen/SearchServlet?pageID=1)」を使用しています。", "バージョン情報");
 		}
 
 		private void miDBInit_Click(object sender, RoutedEventArgs e) {

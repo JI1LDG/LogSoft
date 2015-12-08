@@ -42,7 +42,6 @@ namespace LogProc {
 				if(Abort) break;
 				ld.Searchen = true;
 				ld.Finden = true;
-				ld.ErrorString = "";
 				ld.FailedStr = "";
 				SearchFunc = new SearchData(ld.CallSign);
 				if(SearchFunc.Station == null) {

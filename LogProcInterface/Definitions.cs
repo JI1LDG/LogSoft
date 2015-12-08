@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text.RegularExpressions;
 using System.ComponentModel;
-using LogProc.Interfaces;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace LogProc {
 	namespace Definitions {
@@ -102,7 +102,6 @@ namespace LogProc {
 					}
 				}
 			}
-			public string ErrorString;
 			public bool Rate5 { get { return this.FailedStr.Contains("Lv.5"); } }
 			public bool Rate4 { get { return this.FailedStr.Contains("Lv.4"); } }
 			public bool Rate3 { get { return this.FailedStr.Contains("Lv.3"); } }
@@ -171,6 +170,99 @@ namespace LogProc {
 		public class CategoryData {
 			public string Name { get; set; }
 			public string Code { get; set; }
+
+			public CategoryData() { }
+		}
+
+		public class ErrorReason {
+			public int Level { get; set; }
+			public string Name { get; set; }
+			public string ErrorStr { get; set; }
+			public string Suggest { get; set; }
+			public bool IsSet { get; set; }
+
+			public ErrorReason(int lv, string nm, string es, bool ist = false) {
+				this.Level = lv;
+				this.Name = nm;
+				this.ErrorStr = es;
+				this.IsSet = ist;
+			}
+
+			public static void PutError(List<ErrorReason> ler, ErrorReason ner) {
+				ler.Add(ner);
+				ler = new List<ErrorReason>(ler.OrderBy(l => l.Level));
+			}
+
+			public static void RemoveError(List<ErrorReason> ler, string name) {
+				for (int i = 0; i < ler.Count; i++) {
+					if (ler[i].Name == name) {
+						ler.RemoveAt(i);
+						return;
+					}
+				}
+			}
+
+			public static List<ErrorReason> GetInitial() {
+				var tmp = new List<ErrorReason>();
+
+				tmp.Add(new ErrorReason(5,
+					"UnexistedAreanoWithCn",
+					"コンテストナンバーと対応する、地域番号が存在しません。\r\nもしかして: [Suggest]",
+					false));
+				tmp.Add(new ErrorReason(4, 
+					"UnmatchedCnWithAddress", 
+					"無線局常置場所とコンテストナンバーが一致しません。\r\nもしかして: [Suggest]", 
+					false));
+				tmp.Add(new ErrorReason(4, 
+					"UnmatchedCnWithPortable", 
+					"移動エリアとコンテストナンバーが一致しません。", 
+					false));
+				tmp.Add(new ErrorReason(3, 
+					"InvalidReceivedCn", 
+					"相手局コンテストナンバーが不正です", 
+					false));
+				tmp.Add(new ErrorReason(3, 
+					"FailedToGetData", 
+					"データ取得失敗しました。手動で調べてください。", 
+					false));
+				tmp.Add(new ErrorReason(2, 
+					"CannotConfirmAnvsta", 
+					"記念局確認ができませんでした。", 
+					false));
+				tmp.Add(new ErrorReason(1, 
+					"InvalidSentCn", 
+					"自局コンテストナンバーが不正です。", 
+					false));
+
+				return tmp;
+			}
+
+			public static void SetError(List<ErrorReason> ler, string name, string suggest = null, bool tf = true) {
+				foreach(var l in ler) {
+					if(l.Name == name) {
+						l.IsSet = tf;
+						l.Suggest = suggest;
+						return;
+					}
+				}
+				System.Console.WriteLine("SetError Nothing: " + name + "\r\n");
+			}
+
+			public static string GetFailedStr(List<ErrorReason> ler) {
+				string ret = "";
+
+				int count = 0;
+				foreach(var l in ler) {
+					if (l.IsSet) {
+						if (count != 0) ret += "\r\n";
+						count++;
+						ret += "Lv." + l.Level + ": ";
+						ret += l.ErrorStr.Replace("[Suggest]", l.Suggest);
+					}
+				}
+
+				return ret;
+			}
 		}
 	}
 }

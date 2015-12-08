@@ -5,10 +5,6 @@ using LogProc.Utilities;
 
 namespace LogProc {
 	namespace ACAG {
-		public enum defErrorReason {
-			None = 0x00, FailedGetStation = 0x01, ScnError = 0x02, PortableNCN = 0x04, AddressNCN = 0x08, RcnError = 0x10, DavaileCN = 0x40, AnvStation = 0x80, NonAnvStation = 0x0100,
-		}
-
 		public class Property {
 			public static string ContestName { get { return "全市全郡コンテスト"; } }
 			public static InterSet Intersets { get { return new InterSet(new ContestDefine(), new SearchLog(), new LogSummery()); } }
@@ -244,7 +240,14 @@ namespace LogProc {
 
 		public class SearchLog : ISearch {
 			private List<Area> _areaData;
-			public List<Area> AreaData { get { return _areaData; } }
+			public List<Area> AreaData {
+				get {
+					if (_areaData == null) {
+						_areaData = SearchUtil.GetAreaListFromFile("ACAG");
+					}
+					return _areaData;
+				}
+			}
 			public string ContestName { get { return Property.ContestName; } }
 			private LogData _log;
 			public LogData Log {
@@ -268,19 +271,17 @@ namespace LogProc {
 			}
 			public bool isErrorAvailable {
 				get {
-					if(_der == defErrorReason.None || _der == defErrorReason.AnvStation) return false;
-					else return true;
+					foreach (var e in _er) {
+						if (e.IsSet) return true;
+					}
+					return false;
 				}
 			}
 
-			private defErrorReason _der;
-
-			public SearchLog() {
-				_areaData = SearchUtil.GetAreaListFromFile("ACAG");
-			}
+			private List<ErrorReason> _er;
 
 			public void DoCheck() {
-				_der = defErrorReason.None;
+				_er = ErrorReason.GetInitial();
 				CheckAnv();
 				CheckStationAvailable();
 				CheckScn();
@@ -289,18 +290,16 @@ namespace LogProc {
 			}
 
 			private void CheckAnv() {
-				if(Log.CallSign[0] != '8') return;
+				if (Log.CallSign[0] != '8') return;
 				string cs = defSearch.GetCallSignBesideStroke(Log.CallSign);
-				if(AnvStation.Contains(cs)) {
-					_der |= defErrorReason.AnvStation;
-				} else {
-					_der |= defErrorReason.NonAnvStation;
+				if (!AnvStation.Contains(cs)) {
+					ErrorReason.SetError(_er, "CannotConfirmAnvsta");
 				}
 			}
 
 			private void CheckStationAvailable() {
-				if(Station == null && Log.CallSign[0] != '8') {
-					_der |= defErrorReason.FailedGetStation;
+				if (Station == null && Log.CallSign[0] != '8') {
+					ErrorReason.SetError(_er, "FailedToGetData");
 				}
 			}
 
@@ -314,72 +313,38 @@ namespace LogProc {
 				} else {
 					cn = Config.ContestNo;
 				}
-				if(chk != cn || !SearchUtil.ContestNoIsWithPower(Log.SendenContestNo)) {
-					_der |= defErrorReason.ScnError;
+				if (chk != cn || !SearchUtil.ContestNoIsWithPower(Log.SendenContestNo)) {
+					ErrorReason.SetError(_er, "InvalidSentCn");
 				}
 			}
 
 			private void CheckRcn() {
-				if(!SearchUtil.ContestNoIsWithPower(Log.ReceivenContestNo)) {
-					_der |= defErrorReason.RcnError;
+				if (!SearchUtil.ContestNoIsWithPower(Log.ReceivenContestNo)) {
+					ErrorReason.SetError(_er, "InvalidReceivedCn");
 				}
-				if(SearchUtil.CallSignIsStroke(Log.CallSign)) {
-					if(SearchUtil.GetAreaNoFromCallSign(Log.CallSign) != SearchUtil.GetAreaNoFromRcnTwoDigits(Log)) {
-						_der |= defErrorReason.PortableNCN;
+				if (SearchUtil.CallSignIsStroke(Log.CallSign)) {
+					if (SearchUtil.GetAreaNoFromCallSign(Log.CallSign) != SearchUtil.GetAreaNoFromRcnTwoDigits(Log)) {
+						ErrorReason.SetError(_er, "UnmatchedCnWithPortable");
 					}
 				} else {
-					List<string> address;
-					if((address = SearchUtil.GetAddressListFromContestAreaNo(AreaData, Station, Log, SearchUtil.GetContestAreaNoFromRcnWithPower(Log))) == null) {
-						_der |= defErrorReason.DavaileCN;
+					var address = SearchUtil.GetAddressListOrSuggestFromContestAreaNo(AreaData, Station, Log, SearchUtil.GetContestAreaNoFromRcnWithPower(Log));
+					if (address is string) {
+						ErrorReason.SetError(_er, "UnexistedAreanoWithCn", address as string);
 						return;
 					}
-					if(Station == null) return;
-					foreach(var adr in address) {
-						foreach(var sa in SearchUtil.GetAddressListFromStationData(Station)) {
-							if(sa.Contains(adr)) return;
+					if (Station == null) return;
+					foreach (var adr in address as List<string>) {
+						foreach (var sa in SearchUtil.GetAddressListFromStationData(Station)) {
+							if (sa.Contains(adr)) return;
 						}
 					}
 					string ganfa = SearchUtil.GetAreaNoFromAddress(Station, AreaData);
-					if(ganfa != null) Log.ErrorString = ganfa;
-					_der |= defErrorReason.AddressNCN;
+					ErrorReason.SetError(_er, "UnmatchedCnWithAddress", ganfa);
 				}
 			}
 
 			public void SetErrorStr() {
-				string err = "";
-
-				if(_der.HasFlag(defErrorReason.DavaileCN)) {
-					err += "Lv.5:コンテストナンバーと対応する、地域番号が存在しません。\r\n";
-					if(Log.ErrorString != "") err += "もしかして:" + Log.ErrorString + "\r\n";
-				}
-
-				if(_der.HasFlag(defErrorReason.AddressNCN)) {
-					err += "Lv.4:無線局常置場所とコンテストナンバーが一致しません。\r\n";
-					if(Log.ErrorString != "") err += "もしかして:" + Log.ErrorString + "\r\n";
-				}
-				if(_der.HasFlag(defErrorReason.PortableNCN)) {
-					err += "Lv.4:移動エリアとコンテストナンバーが一致しません。\r\n";
-				}
-
-				if(_der.HasFlag(defErrorReason.RcnError)) {
-					err += "Lv.3:相手局コンテストナンバーが不正です。\r\n";
-				}
-				if(_der.HasFlag(defErrorReason.FailedGetStation)) {
-					err += "Lv.3:データ取得失敗しました。手動で調べてください。\r\n";
-				}
-
-				if(_der.HasFlag(defErrorReason.NonAnvStation)) {
-					err += "Lv.2:記念局確認ができませんでした。\r\n";
-				}
-
-				if(_der.HasFlag(defErrorReason.ScnError)) {
-					err += "Lv.1:自局コンテストナンバーが不正です。\r\n";
-				}
-
-				if(_der.HasFlag(defErrorReason.AnvStation)) {
-					err += "Lv.0:記念局です。\r\n";
-				}
-				Log.FailedStr = err;
+				Log.FailedStr = ErrorReason.GetFailedStr(_er);
 			}
 		}
 

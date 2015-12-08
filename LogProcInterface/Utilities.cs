@@ -151,15 +151,11 @@ namespace LogProc {
 				return AreaData;
 			}
 
-			public static List<string> GetAddressListFromContestAreaNo(List<Area> AreaData, StationData Station, LogData Log, string Areano) {
+			public static object GetAddressListOrSuggestFromContestAreaNo(List<Area> AreaData, StationData Station, LogData Log, string Areano) {
 				foreach(Area a in AreaData) {
 					if(a.No == Areano) return a.Address;
 				}
-				string ganfa = GetContestAreaNoFromStationData(Station, AreaData);
-				if(ganfa != "") {
-					Log.ErrorString = ganfa;
-				}
-				return null;
+				return GetContestAreaNoFromStationData(Station, AreaData);
 			}
 
 			public static string GetContestAreaNoFromStationData(StationData Station, List<Area> AreaData) {
