@@ -24,7 +24,8 @@ namespace LogProc {
 			Setting Config { get; set; }
 			string AnvStation { get; set; }
 			string ContestName { get; }
-			List<Area> AreaData { get; }
+			List<Area> MainArea { get; }
+			List<Area> SubArea { get; }
 			bool isErrorAvailable { get; }
 			void DoCheck();
 			void SetErrorStr();

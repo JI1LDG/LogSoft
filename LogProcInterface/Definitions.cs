@@ -214,8 +214,8 @@ namespace LogProc {
 					"無線局常置場所とコンテストナンバーが一致しません。\r\nもしかして: [Suggest]", 
 					false));
 				tmp.Add(new ErrorReason(4, 
-					"UnmatchedCnWithPortable", 
-					"移動エリアとコンテストナンバーが一致しません。", 
+					"UnmatchedRegion", 
+					"エリアナンバーとコンテストナンバーが一致しません。", 
 					false));
 				tmp.Add(new ErrorReason(3, 
 					"InvalidReceivedCn", 
@@ -246,6 +246,15 @@ namespace LogProc {
 					}
 				}
 				System.Console.WriteLine("SetError Nothing: " + name + "\r\n");
+				throw new  UnexistError();
+			}
+
+			private class UnexistError : System.Exception {
+				public override string Message {
+					get {
+						return "SetError: 定義されていないエラーがセットされました。";
+					}
+				}
 			}
 
 			public static string GetFailedStr(List<ErrorReason> ler) {
@@ -263,6 +272,10 @@ namespace LogProc {
 
 				return ret;
 			}
+		}
+
+		public enum ContestCategoryPower {
+			License = 0x01, Hundred = 0x02, TwentyTen = 0x04, Five = 0x08, None = 0x00,
 		}
 	}
 }

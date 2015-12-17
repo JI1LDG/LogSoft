@@ -45,6 +45,9 @@
       <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Fothint">
+      <HintPath>..\..\Interpreter\Fothint\bin\Release\Fothint.dll</HintPath>
+    </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.9.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlAgilityPack.1.4.9\lib\Net45\HtmlAgilityPack.dll</HintPath>
       <Private>True</Private>
@@ -92,8 +95,6 @@
     <Compile Include="ContestData\6mAndDown.cs" />
     <Compile Include="ContestData\ACAG.cs" />
     <Compile Include="ContestData\ALLJA.cs" />
-    <Compile Include="ContestData\AllKanagawa.cs" />
-    <Compile Include="ContestData\FieldDay.cs" />
     <Compile Include="EditLog.xaml.cs">
       <DependentUpon>EditLog.xaml</DependentUpon>
     </Compile>

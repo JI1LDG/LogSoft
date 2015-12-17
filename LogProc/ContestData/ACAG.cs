@@ -239,36 +239,21 @@ namespace LogProc {
 		}
 
 		public class SearchLog : ISearch {
-			private List<Area> _areaData;
-			public List<Area> AreaData {
+			private List<Area> _mainArea;
+			public List<Area> MainArea {
 				get {
-					if (_areaData == null) {
-						_areaData = SearchUtil.GetAreaListFromFile("ACAG");
+					if (_mainArea == null) {
+						_mainArea = SearchUtil.GetAreaListFromFile("ACAG");
 					}
-					return _areaData;
+					return _mainArea;
 				}
 			}
+			public List<Area> SubArea { get; }
 			public string ContestName { get { return Property.ContestName; } }
-			private LogData _log;
-			public LogData Log {
-				get { return _log; }
-				set { _log = value; }
-			}
-			private StationData _station;
-			public StationData Station {
-				get { return _station; }
-				set { _station = value; }
-			}
-			private Setting _config;
-			public Setting Config {
-				get { return _config; }
-				set { _config = value; }
-			}
-			private string _anvStation;
-			public string AnvStation {
-				get { return _anvStation; }
-				set { _anvStation = value; }
-			}
+			public LogData Log { get; set; }
+			public StationData Station { get; set; }
+			public Setting Config { get; set; }
+			public string AnvStation { get; set; }
 			public bool isErrorAvailable {
 				get {
 					foreach (var e in _er) {
@@ -282,64 +267,50 @@ namespace LogProc {
 
 			public void DoCheck() {
 				_er = ErrorReason.GetInitial();
-				CheckAnv();
-				CheckStationAvailable();
+				SearchUtil.AnvstaChk(Log.CallSign, AnvStation, _er, Station);
+				if (Station == null) {
+					ErrorReason.SetError(_er, "FailedToGetData");
+				}
+				Log.Point = 1;
 				CheckScn();
 				CheckRcn();
 				SetErrorStr();
 			}
 
-			private void CheckAnv() {
-				if (Log.CallSign[0] != '8') return;
-				string cs = defSearch.GetCallSignBesideStroke(Log.CallSign);
-				if (!AnvStation.Contains(cs)) {
-					ErrorReason.SetError(_er, "CannotConfirmAnvsta");
-				}
-			}
-
-			private void CheckStationAvailable() {
-				if (Station == null && Log.CallSign[0] != '8') {
-					ErrorReason.SetError(_er, "FailedToGetData");
-				}
-			}
-
 			private void CheckScn() {
-				string chk;
-				if(Log.Mode != "CW") chk = Log.SendenContestNo.Substring(2);
-				else chk = Log.SendenContestNo.Substring(3);
-				string cn;
-				if(Config.IsSubCN && defCTESTWIN.GetFreqNum(Log.Frequency) >= 13) {
-					cn = Config.SubContestNo;
-				} else {
-					cn = Config.ContestNo;
-				}
-				if (chk != cn || !SearchUtil.ContestNoIsWithPower(Log.SendenContestNo)) {
+				string chk = SearchUtil.GetRSTVal(Log)[0];
+				var cn = Config.ContestNo;
+				if (chk != cn || SearchUtil.CnHasPower(Log.SendenContestNo) == false) {
 					ErrorReason.SetError(_er, "InvalidSentCn");
 				}
 			}
 
 			private void CheckRcn() {
-				if (!SearchUtil.ContestNoIsWithPower(Log.ReceivenContestNo)) {
+				if (SearchUtil.CnHasPower(Log.ReceivenContestNo) == false) {
 					ErrorReason.SetError(_er, "InvalidReceivedCn");
 				}
-				if (SearchUtil.CallSignIsStroke(Log.CallSign)) {
-					if (SearchUtil.GetAreaNoFromCallSign(Log.CallSign) != SearchUtil.GetAreaNoFromRcnTwoDigits(Log)) {
-						ErrorReason.SetError(_er, "UnmatchedCnWithPortable");
-					}
-				} else {
-					var address = SearchUtil.GetAddressListOrSuggestFromContestAreaNo(AreaData, Station, Log, SearchUtil.GetContestAreaNoFromRcnWithPower(Log));
-					if (address is string) {
-						ErrorReason.SetError(_er, "UnexistedAreanoWithCn", address as string);
-						return;
-					}
-					if (Station == null) return;
-					foreach (var adr in address as List<string>) {
-						foreach (var sa in SearchUtil.GetAddressListFromStationData(Station)) {
-							if (sa.Contains(adr)) return;
-						}
-					}
-					string ganfa = SearchUtil.GetAreaNoFromAddress(Station, AreaData);
-					ErrorReason.SetError(_er, "UnmatchedCnWithAddress", ganfa);
+
+				//59##L
+				var prefno = SearchUtil.GetPrefno(Log, true);
+				var hasStroke = SearchUtil.CallsignHasStroke(Log.CallSign);
+				//11 -> 1
+				var arearegion = SearchUtil.GetRegionFromCn(prefno);
+				//JA#YPZ JA1YPZ/#
+				var callregion = SearchUtil.GetRegionFromCallSign(Log.CallSign, hasStroke);
+				var areano = SearchUtil.GetAreano(Log, true);
+				var areanoExists = SearchUtil.AreanoExists(MainArea, areano);
+				var stationAddress = SearchUtil.GetStationAddressList(Station);
+				var staAddrStr = SearchUtil.ConvToStrFromList(stationAddress);
+				var stationAreano = SearchUtil.GetAreanoFromStation(Station, MainArea);
+				var staAreanoStr = SearchUtil.ConvToStrFromList(stationAreano);
+				if (arearegion != callregion) {
+					ErrorReason.SetError(_er, "UnmatchedRegion");
+				}
+				if (SearchUtil.AreanoMatches(areano, stationAreano) == false && Station != null && hasStroke == false) {
+					ErrorReason.SetError(_er, "UnmatchedCnWithAddress", staAreanoStr);
+				}
+				if (areanoExists == false) {
+					ErrorReason.SetError(_er, "UnexistedAreanoWithCn", staAddrStr);
 				}
 			}
 
@@ -350,30 +321,14 @@ namespace LogProc {
 
 		public class LogSummery : ISummery {
 			public string ContestName { get { return Property.ContestName; } }
-			private Setting _config;
-			public Setting Config {
-				get { return _config; }
-				set { _config = value; }
-			}
+			public Setting Config { get; set; }
 			public bool isEditenScore { get { return false; } }
-			private List<Multiply> _multi;
-			public List<Multiply> Multi {
-				get { return _multi; }
-				set { _multi = value; }
-			}
-			private int _freqNum;
-			public int FreqNum {
-				get { return _freqNum; }
-				set { _freqNum = value; }
-			}
-			private int _areaMax;
-			public int AreaMax {
-				get { return _areaMax; }
-				set { _areaMax = value; }
-			}
+			public List<Multiply> Multi { get; set; }
+			public int FreqNum { get; set; }
+			public int AreaMax { get; set; }
 
 			public string GetContestAreaNoFromRcn(LogData Log) {
-				return SearchUtil.GetContestAreaNoFromRcnWithPower(Log);
+				return SearchUtil.GetAreano(Log, (defCTESTWIN.GetFreqNum(Log.Frequency) < defCTESTWIN.GetFreqNum("2400MHz")) ? false : true);
 			}
 
 			public string GetScoreStr() {
