@@ -232,7 +232,6 @@ namespace LogProc {
 		}
 
 		public class LogSummery : ISummery {
-			private bool SubSelecter { get { return FreqNum < defCTESTWIN.GetFreqNum("2400MHz"); } }
 			public string ContestName { get { return Property.ContestName; } }
 			public Setting Config { get; set; }
 			public bool isEditenScore { get { return false; } }

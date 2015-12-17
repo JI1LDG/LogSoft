@@ -37,6 +37,7 @@ namespace LogProc {
 			Intersets.Add(ALLJA.Property.Intersets);
 			Intersets.Add(AllKanagawa.Property.Intersets);
 			Intersets.Add(SixMAndDown.Property.Intersets);
+			Intersets.Add(FieldDay.Property.Intersets);
 			Intersets.Add(ACAG.Property.Intersets);
 		}
 
