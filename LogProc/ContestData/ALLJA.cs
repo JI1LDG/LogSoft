@@ -239,7 +239,7 @@ namespace LogProc {
 				var areano = SearchUtil.GetAreano(Log);
 				var areanoExists = SearchUtil.AreanoExists(MainArea, areano);
 				var stationAddress = SearchUtil.GetStationAddressList(Station);
-				var staAddrStr = SearchUtil.ConvToStrFromList(stationAddress);
+				var staAddrStr = SearchUtil.ConvToStrFromList(SearchUtil.GetAreanoFromAddressList(stationAddress, MainArea));
 				var stationAreano = SearchUtil.GetAreanoFromStation(Station, MainArea);
 				var staAreanoStr = SearchUtil.ConvToStrFromList(stationAreano);
 				if (arearegion != callregion) {

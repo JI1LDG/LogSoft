@@ -66,7 +66,7 @@ namespace LogProc {
 
 			//59(9)####(*)
 			public static string GetPrefno(LogData Log, bool AcagMode = false) {
-				string res = GetAreano(Log, AcagMode);
+				string res = GetAreano(Log);
 				if (AcagMode) {
 					return res.Substring(0, 2);
 				} else {
@@ -74,7 +74,7 @@ namespace LogProc {
 				}
 			}
 
-			public static string GetAreano(LogData Log, bool AcagMode = false) {
+			public static string GetAreano(LogData Log) {
 				Match m;
 				if (Log.Mode != "CW") m = Regex.Match(Log.ReceivenContestNo, @"(\d\d)(\d*)\w*");
 				else m = Regex.Match(Log.ReceivenContestNo, @"(\d\d\d)(\d*)\w*");
@@ -123,10 +123,25 @@ namespace LogProc {
 				return res;
 			}
 
+			public static List<string> GetAreanoFromAddressList(List<string> AddressList, List<Area> AreaData) {
+				if (AddressList == null) return null;
+				var tmp = new List<string>();
+				foreach(var al in AddressList) {
+					foreach(var ad in AreaData) {
+						foreach(var a in ad.Address) {
+							if (al.Contains(a)) {
+								tmp.Add(al + "(" + ad.No + ")");
+							}
+						}
+					}
+				}
+				return tmp;
+			}
+
 			public static List<string> GetStationAddressList(StationData Station) {
 				if (Station == null) return null;
 				var tmp = new List<string>();
-				var spl = Station.Address.Split(new char[] { ',', ' ' });
+				var spl = Station.Address.Split(new char[] { ',' });
 				return spl.ToList<string>();
 			}
 

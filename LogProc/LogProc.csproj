@@ -95,6 +95,7 @@
     <Compile Include="ContestData\6mAndDown.cs" />
     <Compile Include="ContestData\ACAG.cs" />
     <Compile Include="ContestData\ALLJA.cs" />
+    <Compile Include="ContestData\AllKanagawa.cs" />
     <Compile Include="EditLog.xaml.cs">
       <DependentUpon>EditLog.xaml</DependentUpon>
     </Compile>

@@ -297,10 +297,10 @@ namespace LogProc {
 				var arearegion = SearchUtil.GetRegionFromCn(prefno);
 				//JA#YPZ JA1YPZ/#
 				var callregion = SearchUtil.GetRegionFromCallSign(Log.CallSign, hasStroke);
-				var areano = SearchUtil.GetAreano(Log, true);
+				var areano = SearchUtil.GetAreano(Log);
 				var areanoExists = SearchUtil.AreanoExists(MainArea, areano);
 				var stationAddress = SearchUtil.GetStationAddressList(Station);
-				var staAddrStr = SearchUtil.ConvToStrFromList(stationAddress);
+				var staAddrStr = SearchUtil.ConvToStrFromList(SearchUtil.GetAreanoFromAddressList(stationAddress, MainArea));
 				var stationAreano = SearchUtil.GetAreanoFromStation(Station, MainArea);
 				var staAreanoStr = SearchUtil.ConvToStrFromList(stationAreano);
 				if (arearegion != callregion) {
@@ -328,7 +328,7 @@ namespace LogProc {
 			public int AreaMax { get; set; }
 
 			public string GetContestAreaNoFromRcn(LogData Log) {
-				return SearchUtil.GetAreano(Log, (defCTESTWIN.GetFreqNum(Log.Frequency) < defCTESTWIN.GetFreqNum("2400MHz")) ? false : true);
+				return SearchUtil.GetAreano(Log);
 			}
 
 			public string GetScoreStr() {
