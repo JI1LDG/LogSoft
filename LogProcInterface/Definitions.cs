@@ -219,7 +219,7 @@ namespace LogProc {
 					false));
 				tmp.Add(new ErrorReason(3, 
 					"InvalidReceivedCn", 
-					"相手局コンテストナンバーが不正です", 
+					"相手局コンテストナンバーが不正です。", 
 					false));
 				tmp.Add(new ErrorReason(3, 
 					"FailedToGetData", 

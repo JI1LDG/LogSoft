@@ -157,12 +157,7 @@ namespace LogProc {
 
 			public static string ConvToStrFromList(List<string> lstr) {
 				if (lstr == null) return "";
-				string tmp = "";
-				for(int i = 0;i < lstr.Count; i++) {
-					if (i != 0) tmp += ", ";
-					tmp += lstr[i];
-				}
-				return tmp;
+				return string.Join(", ", lstr.ToArray());
 			}
 
 			public static List<Area> GetAreaListFromFile(string AreaFileName) {
@@ -235,7 +230,6 @@ namespace LogProc {
 					return Work.Config.Operator;
 				}
 				List<string> op = new List<string>();
-				string ans = "";
 				foreach(var l in Work.Log) {
 					bool avail = false;
 					foreach(var o in op) {
@@ -250,14 +244,7 @@ namespace LogProc {
 					op.Add(l.Operator);
 				}
 				op.Sort();
-				for(int i = 0;i < op.Count;i++) {
-					if(i == 0) {
-						ans += op[i];
-					} else {
-						ans += ", " + op[i];
-					}
-				}
-				return ans;
+				return string.Join(", ", op.ToArray());
 			}
 		}
 	}
