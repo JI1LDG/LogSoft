@@ -267,14 +267,28 @@ namespace LogProc {
 
 			public void DoCheck() {
 				_er = ErrorReason.GetInitial();
+				CheckLog();
+				CheckScn();
+				CheckRcn();
+				SetErrorStr();
+			}
+
+			private void CheckLog() {
 				SearchUtil.AnvstaChk(Log.CallSign, AnvStation, _er, Station);
 				if (Station == null) {
 					ErrorReason.SetError(_er, "FailedToGetData");
 				}
 				Log.Point = 1;
-				CheckScn();
-				CheckRcn();
-				SetErrorStr();
+				switch (Log.Frequency) {
+					case "1.9MHz":
+					case "10MHz":
+					case "18MHz":
+					case "24MHz":
+						Log.Point = 0;
+						ErrorReason.SetError(_er, "OutOfFrequency");
+						break;
+					default: break;
+				}
 			}
 
 			private void CheckScn() {

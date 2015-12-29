@@ -222,14 +222,35 @@ namespace LogProc {
 			public void DoCheck() {
 				_er = ErrorReason.GetInitial();
 				ErrorReason.PutError(_er, new ErrorReason(5, "NotInKanagawa", "神奈川県内の局ではありません。無効です。"));
+				CheckLog();
+				CheckScn();
+				CheckRcn();
+				SetErrorStr();
+			}
+
+			private void CheckLog() {
 				SearchUtil.AnvstaChk(Log.CallSign, AnvStation, _er, Station);
 				if (Station == null) {
 					ErrorReason.SetError(_er, "FailedToGetData");
 				}
 				Log.Point = 1;
-				CheckScn();
-				CheckRcn();
-				SetErrorStr();
+				if (15 <= Log.Date.Hour && Log.Date.Hour <= 18) {
+					switch (Log.Frequency) {
+						case "14MHz": case "21MHz": case "28MHz":
+						case "50MHz": case "1200MHz": case "2400MHz":
+							return;
+						default: break;
+					}
+				} else if (21 <= Log.Date.Hour && Log.Date.Hour < 24) {
+					switch (Log.Frequency) {
+						case "1.9MHz": case "3.5MHz": case "7MHz":
+						case "144MHz": case "430MHz":
+							return;
+						default: break;
+					}
+				}
+				Log.Point = 0;
+				ErrorReason.SetError(_er, "OutOfFrequency");
 			}
 
 			private void CheckScn() {

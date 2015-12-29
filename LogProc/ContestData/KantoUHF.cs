@@ -118,14 +118,22 @@ namespace LogProc {
 			public void DoCheck() {
 				_er = ErrorReason.GetInitial();
 				ErrorReason.PutError(_er, new ErrorReason(5, "NotInKanto", "関東圏の局ではありません。無効です。"));
+				CheckLog();
+				CheckScn();
+				CheckRcn();
+				SetErrorStr();
+			}
+
+			private void CheckLog() {
 				SearchUtil.AnvstaChk(Log.CallSign, AnvStation, _er, Station);
 				if (Station == null) {
 					ErrorReason.SetError(_er, "FailedToGetData");
 				}
 				Log.Point = 1;
-				CheckScn();
-				CheckRcn();
-				SetErrorStr();
+				if (defCTESTWIN.GetFreqNum(Log.Frequency) < defCTESTWIN.GetFreqNum("430MHz")) {
+					Log.Point = 0;
+					ErrorReason.SetError(_er, "OutOfFrequency");
+				}
 			}
 
 			private void CheckScn() {

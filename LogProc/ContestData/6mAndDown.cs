@@ -178,15 +178,23 @@ namespace LogProc {
 
 			public void DoCheck() {
 				_er = ErrorReason.GetInitial();
+				CheckLog();
+				CheckScn();
+				CheckRcn();
+				SetErrorStr();
+			}
+
+			private void CheckLog() {
 				SearchUtil.AnvstaChk(Log.CallSign, AnvStation, _er, Station);
 				if (Station == null) {
 					ErrorReason.SetError(_er, "FailedToGetData");
 				}
 				if (SubSelecter) Log.Point = 1;
 				else Log.Point = 2;
-				CheckScn();
-				CheckRcn();
-				SetErrorStr();
+				if(defCTESTWIN.GetFreqNum(Log.Frequency) < defCTESTWIN.GetFreqNum("50MHz")) {
+					Log.Point = 0;
+					ErrorReason.SetError(_er, "OutOfFrequency");
+				}
 			}
 
 			private void CheckScn() {
