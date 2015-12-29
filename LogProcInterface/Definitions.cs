@@ -209,6 +209,10 @@ namespace LogProc {
 					"UnexistedAreanoWithCn",
 					"コンテストナンバーと対応する、地域番号が存在しません。\r\nもしかして: [Suggest]",
 					false));
+				tmp.Add(new ErrorReason(5,
+					"OutOfFrequency",
+					"コンテストで使用される周波数ではない、もしくは、時間外です。",
+					false));
 				tmp.Add(new ErrorReason(4, 
 					"UnmatchedCnWithAddress", 
 					"無線局常置場所とコンテストナンバーが一致しません。\r\nもしかして: [Suggest]", 
