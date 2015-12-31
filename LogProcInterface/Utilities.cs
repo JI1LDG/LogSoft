@@ -219,8 +219,9 @@ namespace LogProc {
 
 			public static string Get8JStationDataFromWeb() {
 				System.Net.WebClient wc = new System.Net.WebClient();
-				string source = wc.DownloadString("http://www.motobayashi.net/8j-station/2014.html");
-				source += wc.DownloadString("http://www.motobayashi.net/8j-station/2015.html");
+				int nowyr = System.DateTime.Now.Year - 1;
+				string source = wc.DownloadString("http://www.motobayashi.net/8j-station/" + nowyr + ".html");
+				source += wc.DownloadString("http://www.motobayashi.net/8j-station/" + nowyr + 1 + ".html");
 
 				return source;
 			}
