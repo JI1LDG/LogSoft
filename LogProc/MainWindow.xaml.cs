@@ -50,7 +50,7 @@ namespace LogProc {
 			int erroren = 0;
 
 			lbReadenLogNum.Content = Work.Log.Count;
-			Work.Log = new ObservableCollection<LogData>(Work.Log.OrderBy(l => l.Date));
+			Work.Log = new ObservableCollection<LogData>(Work.Log.OrderByDescending(l => l.FailedStr));
 			dgLog.ItemsSource = Work.Log;
 			if(Work.Config != null) lbSettingConfigen.Content = "";
 			foreach(var l in Work.Log) {
@@ -127,7 +127,7 @@ namespace LogProc {
 			LogData ld = dgcell.DataContext as LogData;
 			ContextMenu cm = new ContextMenu();
 
-			var datalist = dg.SelectedItems.Cast<LogData>().ToList<LogData>();
+			var datalist = new ObservableCollection<LogData>(dg.SelectedItems.Cast<LogData>().ToList<LogData>());
 			if(!datalist.Contains(ld)) {
 				dg.SelectedItem = ld;
 			}
@@ -142,10 +142,14 @@ namespace LogProc {
 			miLogEdit.Click += EditLog;
 			miLogEdit.Header = "ログ修正";
 
+			MenuItem miLogSearch = new MenuItem();
+			miLogSearch.Click += SearchLogEachly;
+			miLogSearch.Header = "集計処理";
+
 			if(!datalist.Contains(ld) || datalist.Count == 1) {
 				cm.Items.Add(new Separator());
 				miLogEdit.CommandParameter = new List<LogData>() { ld };
-				cm.Items.Add(miLogEdit);
+				miLogSearch.CommandParameter = new ObservableCollection<LogData>() { ld };
 			} else {
 				MenuItem miSearches = new MenuItem();
 				miSearches.Click += SearchByWeb;
@@ -156,8 +160,10 @@ namespace LogProc {
 				cm.Items.Add(new Separator());
 
 				miLogEdit.CommandParameter = datalist;
-				cm.Items.Add(miLogEdit);
+				miLogSearch.CommandParameter = datalist;
 			}
+			cm.Items.Add(miLogEdit);
+			cm.Items.Add(miLogSearch);
 
 			ContextMenuService.SetContextMenu(dgcell, cm);
 		}
@@ -175,8 +181,8 @@ namespace LogProc {
 
 			if(cp is string) {
 				AccessStationSearch(cp.ToString());
-			} else if(cp is List<LogData>) {
-				foreach(var ld in cp as List<LogData>) {
+			} else if(cp is ObservableCollection<LogData>) {
+				foreach(var ld in cp as ObservableCollection<LogData>) {
 					AccessStationSearch(ld.CallSign);
 				}
 			}
@@ -184,8 +190,22 @@ namespace LogProc {
 		}
 
 		private void EditLog(object sender, RoutedEventArgs e) {
-			LogEdit le = new LogEdit((sender as MenuItem).CommandParameter as List<LogData>);
+			LogEdit le = new LogEdit(((sender as MenuItem).CommandParameter as ObservableCollection<LogData>).ToList<LogData>());
 			le.ShowDialog();
+			UpdateData();
+		}
+
+		private void SearchLogEachly(object sender, RoutedEventArgs e) {
+			var eventlogdata = (sender as MenuItem).CommandParameter as ObservableCollection<LogData>;
+			Work.Config = ConfTab.GetSetting();
+			SetNowIntersets();
+			UpdateData();
+			if (nowItst == null || eventlogdata == null || Work.Log.Count == 0) {
+				MessageBox.Show("チェックするログがない、もしくは局情報等が設定されてません。", "通知");
+				return;
+			}
+			SearchWindow sw = new SearchWindow(new WorkingData() { Config = ConfTab.GetSetting(), Log = eventlogdata }, nowItst.Sea);
+			sw.ShowDialog();
 			UpdateData();
 		}
 
@@ -235,11 +255,13 @@ namespace LogProc {
 			Work.Config = ConfTab.GetSetting();
 			SetNowIntersets();
 			UpdateData();
-			if(nowItst == null || Work.Log == null || Work.Log.Count == 0) {
+			if (nowItst == null || Work.Log == null || Work.Log.Count == 0) {
 				MessageBox.Show("チェックするログがない、もしくは局情報等が設定されてません。", "通知");
 				return;
 			}
-			OutputSummery os = new OutputSummery(Work, nowItst.Sum);
+			
+			OutputSummery os = new OutputSummery(new WorkingData() { Config = ConfTab.GetSetting(), Log = new ObservableCollection<LogData>(Work.Log.OrderBy(l => l.Date))
+		}, nowItst.Sum);
 			os.ShowDialog();
 			UpdateData();
 		}

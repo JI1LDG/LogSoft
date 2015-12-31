@@ -220,8 +220,13 @@ namespace LogProc {
 			public static string Get8JStationDataFromWeb() {
 				System.Net.WebClient wc = new System.Net.WebClient();
 				int nowyr = System.DateTime.Now.Year - 1;
-				string source = wc.DownloadString("http://www.motobayashi.net/8j-station/" + nowyr + ".html");
-				source += wc.DownloadString("http://www.motobayashi.net/8j-station/" + nowyr + 1 + ".html");
+				string source = "8jsta";
+				try {
+					source = wc.DownloadString("http://www.motobayashi.net/8j-station/" + nowyr + ".html");
+					source += wc.DownloadString("http://www.motobayashi.net/8j-station/" + nowyr + 1 + ".html");
+				} catch(System.Net.WebException e) {
+					System.Console.WriteLine("GetError: " + e.Message);
+				}
 
 				return source;
 			}
