@@ -16,59 +16,63 @@ namespace LogProc {
 			public bool IsSubCN { get { return false; } }
 			public string ContestName { get { return Property.ContestName; } }
 			private List<CategoryData> _contestCategolies = new List<CategoryData>() {
-			new CategoryData(){
-				Name = "電話部門シングルオペマルチバンド",
-				Code = "AM",
-			},
-			new CategoryData(){
-				Name = "電信部門シングルオペ430MHz",
-				Code = "A430",
-			},
-			new CategoryData(){
-				Name = "電信部門シングルオペ1200MHzバンド",
-				Code = "A1200",
-			},
-			new CategoryData(){
-				Name = "電信部門シングルオペ2400MHzバンド",
-				Code = "A2400",
-			},
-			new CategoryData(){
-				Name = "電信部門シングルオペ5600MHzバンド",
-				Code = "A5600",
-			},
-			new CategoryData(){
-				Name = "電信部門シングルオペ10GHz",
-				Code = "A10G",
-			},
-			new CategoryData(){
-				Name = "電信電話部門シングルオペマルチバンド",
-				Code = "BM",
-			},
-			new CategoryData(){
-				Name = "電信電話部門シングルオペ430MHzバンド",
-				Code = "B430",
-			},
-			new CategoryData(){
-				Name = "電信電話部門シングルオペ1200MHzバンド",
-				Code = "B1200",
-			},
-			new CategoryData(){
-				Name = "電信電話部門シングルオペ2400MHzバンド",
-				Code = "B2400",
-			},
-			new CategoryData(){
-				Name = "電信電話部門シングルオペ5600MHzバンド",
-				Code = "B5600",
-			},
-			new CategoryData(){
-				Name = "電信電話部門シングルオペ10GHz",
-				Code = "B10G",
-			},
-			new CategoryData() {
-				Name = "SWL",
-				Code = "C",
-			},
-		};
+				new CategoryData() {
+					Name ="ヤング部門",
+					Code = "YM",
+				},
+				new CategoryData(){
+					Name = "電話部門シングルオペマルチバンド",
+					Code = "AM",
+				},
+				new CategoryData(){
+					Name = "電信部門シングルオペ430MHz",
+					Code = "A430",
+				},
+				new CategoryData(){
+					Name = "電信部門シングルオペ1200MHzバンド",
+					Code = "A1200",
+				},
+				new CategoryData(){
+					Name = "電信部門シングルオペ2400MHzバンド",
+					Code = "A2400",
+				},
+				new CategoryData(){
+					Name = "電信部門シングルオペ5600MHzバンド",
+					Code = "A5600",
+				},
+				new CategoryData(){
+					Name = "電信部門シングルオペ10GHz",
+					Code = "A10G",
+				},
+				new CategoryData(){
+					Name = "電信電話部門シングルオペマルチバンド",
+					Code = "BM",
+				},
+				new CategoryData(){
+					Name = "電信電話部門シングルオペ430MHzバンド",
+					Code = "B430",
+				},
+				new CategoryData(){
+					Name = "電信電話部門シングルオペ1200MHzバンド",
+					Code = "B1200",
+				},
+				new CategoryData(){
+					Name = "電信電話部門シングルオペ2400MHzバンド",
+					Code = "B2400",
+				},
+				new CategoryData(){
+					Name = "電信電話部門シングルオペ5600MHzバンド",
+					Code = "B5600",
+				},
+				new CategoryData(){
+					Name = "電信電話部門シングルオペ10GHz",
+					Code = "B10G",
+				},
+				new CategoryData() {
+					Name = "SWL",
+					Code = "C",
+				},
+			};
 			public List<CategoryData> ContestCategolies { get { return _contestCategolies; } }
 
 			public ContestPower AllowenPowerInCategoryCode(string Code) {
@@ -151,7 +155,7 @@ namespace LogProc {
 
 				//59##L
 				var prefno = SearchUtil.GetPrefno(Log, true);
-				if(10 > int.Parse(prefno) || int.Parse(prefno) > 17) {
+				if (10 > int.Parse(prefno) || int.Parse(prefno) > 17) {
 					ErrorReason.SetError(_er, "NotInKanto");
 					Log.Point = 0;
 				}
