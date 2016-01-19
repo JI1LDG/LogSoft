@@ -174,7 +174,7 @@ namespace LogProc {
 
 			if(!datalist.Contains(ld) || datalist.Count == 1) {
 				cm.Items.Add(new Separator());
-				miLogEdit.CommandParameter = new List<LogData>() { ld };
+				miLogEdit.CommandParameter = new ObservableCollection<LogData>() { ld };
 				miLogSearch.CommandParameter = new ObservableCollection<LogData>() { ld };
 			} else {
 				MenuItem miSearches = new MenuItem();

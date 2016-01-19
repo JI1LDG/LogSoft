@@ -43,8 +43,16 @@
 		<DockPanel>
 			<Button Name="btEditLogExecute" Content="ログ修正実行" DockPanel.Dock="Right" Click="btEditLogExecute_Click"/>
 			<WrapPanel>
-				<Label Content="自局CN"/>
-				<TextBox Name="tbSendenCN" MinWidth="50" CharacterCasing="Upper"/>
+				<ComboBox Name="cbLogSlcter" IsEditable="False" Text="コールサイン">
+					<ComboBoxItem Content="コールサイン"/>
+					<ComboBoxItem Content="自局CN"/>
+					<ComboBoxItem Content="相手CN"/>
+					<ComboBoxItem Content="周波数"/>
+					<ComboBoxItem Content="モード"/>
+					<ComboBoxItem Content="オペレータ"/>
+				</ComboBox>
+				<TextBox Name="tbSendenCN" MinWidth="50" CharacterCasing="Upper">
+				</TextBox>
 			</WrapPanel>
 		</DockPanel>
 	</StackPanel>

@@ -213,6 +213,10 @@ namespace LogProc {
 					"OutOfFrequency",
 					"コンテストで使用される周波数ではない、もしくは、時間外です。",
 					false));
+				tmp.Add(new ErrorReason(5,
+					"UnexistedFrequency",
+					"周波数が不正です。ログに出力されません。",
+					false));
 				tmp.Add(new ErrorReason(4, 
 					"UnmatchedCnWithAddress", 
 					"無線局常置場所とコンテストナンバーが一致しません。\r\nもしかして: [Suggest]", 

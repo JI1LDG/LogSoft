@@ -34,7 +34,27 @@ namespace LogProc {
 		private void btEditLogExecute_Click(object sender, RoutedEventArgs e) { 
 			foreach(var l in Log) {
 				if(tbSendenCN.Text != null && tbSendenCN.Text != "") {
-					l.SendenContestNo = tbSendenCN.Text;
+					switch (cbLogSlcter.Text) {
+						case "コールサイン":
+							l.CallSign = tbSendenCN.Text;
+							break;
+						case "自局CN":
+							l.SendenContestNo = tbSendenCN.Text;
+							break;
+						case "相手CN":
+							l.ReceivenContestNo = tbSendenCN.Text;
+							break;
+						case "周波数":
+							l.Frequency = tbSendenCN.Text + "MHz";
+							break;
+						case "モード":
+							l.Mode = tbSendenCN.Text;
+							break;
+						case "オペレータ":
+							l.Operator = tbSendenCN.Text;
+							break;
+						default: break;
+					}
 				}
 			}
 			this.Close();

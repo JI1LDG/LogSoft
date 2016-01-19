@@ -317,6 +317,10 @@ namespace LogProc {
 				var staAddrStr = SearchUtil.ConvToStrFromList(SearchUtil.GetAreanoFromAddressList(stationAddress, MainArea));
 				var stationAreano = SearchUtil.GetAreanoFromStation(Station, MainArea);
 				var staAreanoStr = SearchUtil.ConvToStrFromList(stationAreano);
+				var freqchk = SearchUtil.FrequencyChk(Log.Frequency);
+				if (freqchk == false) {
+					ErrorReason.SetError(_er, "UnexistedFrequency");
+				}
 				if (arearegion != callregion) {
 					ErrorReason.SetError(_er, "UnmatchedRegion");
 				}

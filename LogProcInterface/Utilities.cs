@@ -24,6 +24,12 @@ namespace LogProc {
 				return chk.ToArray();
 			}
 
+			public static bool FrequencyChk(string freq) {
+				if (defCTESTWIN.GetFreqNum(freq) == -1) {
+					return false;
+				} else return true;
+			}
+
 			public static bool IsJPCallSign(string CallSign) {
 				if(CallSign[0] == 'J') {
 					if('A' <= CallSign[1] && CallSign[1] <= 'S') return true;
