@@ -20,12 +20,13 @@ namespace LogProc {
 			InitializeComponent();
 			tbOutput.Text = ol.Sheet;
 		}
+	}
 
-		class OutputLog {
+	public class OutputLog {
 			private ISummery Plugins;
 			private WorkingData Work { get; set; }
 			private List<Multiply> Multi;
-			private string opLog;
+			public string opLog;
 			private string Summery;
 			public string Sheet { get; set; }
 			private int freqNum;
@@ -37,10 +38,12 @@ namespace LogProc {
 				areaMax = 500000;
 				Multi = new List<Multiply>();
 				Work = wd;
-				Plugins.Config = Work.Config;
-				Plugins.AreaMax = areaMax;
-				Plugins.FreqNum = freqNum;
-				Plugins.Multi = Multi;
+				if (Plugins != null) {
+					Plugins.Config = Work.Config;
+					Plugins.AreaMax = areaMax;
+					Plugins.FreqNum = freqNum;
+					Plugins.Multi = Multi;
+				}
 			}
 
 			public bool Execute() {
@@ -76,8 +79,10 @@ namespace LogProc {
 				Summery += "</SUMMARYSHEET>\r\n";
 			}
 
-			public void CreateLog() {
-				opLog = "<LOGSHEET TYPE=CTESTWIN>\r\nmon day time callsign        sent       rcvd       multi  MHz  mode pts memo\r\n";
+			public void CreateLog(bool sheetType = true) {
+			opLog = "";
+			if(sheetType) opLog += "<LOGSHEET TYPE=CTESTWIN>\r\n";
+			opLog += "mon day time callsign        sent       rcvd       multi  MHz  mode pts memo\r\n";
 				foreach(var l in Work.Log) {
 					bool mul = false;
 					bool found = false;
@@ -107,7 +112,7 @@ namespace LogProc {
 					opLog += l.Point.ToString().PadRight(4);
 					opLog += l.Operator + "\r\n";
 				}
-				opLog += "</LOGSHEET>\r\n";
+			if (sheetType) opLog += "</LOGSHEET>\r\n";
 			}
 
 			private string GetScoreStr() {
@@ -143,5 +148,4 @@ namespace LogProc {
 				return m.Groups[1].Value;
 			}
 		}
-	}
 }

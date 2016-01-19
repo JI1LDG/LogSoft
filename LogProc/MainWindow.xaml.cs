@@ -77,6 +77,32 @@ namespace LogProc {
 			UpdateData();
 		}
 
+		private void miOutputFile_Click(object sender, RoutedEventArgs e) {
+			Work.Config = ConfTab.GetSetting();
+			SetNowIntersets();
+			UpdateData();
+			if (nowItst == null) {
+				MessageBox.Show("コンテスト情報を設定してください。", "通知");
+				return;
+			}
+			var ol = new OutputLog(Work, nowItst.Sum);
+			ol.CreateLog(false);
+			string output = ol.opLog;
+			if (output == null) {
+				MessageBox.Show("ログ生成に失敗しました。", "通知");
+				return;
+			}
+			SaveFileDialog sfd = new SaveFileDialog();
+			sfd.Title = "ログファイルの保存";
+			sfd.Filter = "ログファイル(*.txt)|*.txt";
+			if (sfd.ShowDialog() == true) {
+				string filename = sfd.FileName;
+				var sw = new System.IO.StreamWriter(filename, false, System.Text.Encoding.UTF8);
+				sw.WriteLine(output);
+				sw.Close();
+			}
+		}
+
 		private void miLoadWork_Click(object sender, RoutedEventArgs e) {
 			OpenFileDialog ofd = new OpenFileDialog();
 			ofd.Title = "作業ファイルの読み込み";
