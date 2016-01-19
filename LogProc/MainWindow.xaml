@@ -4,7 +4,7 @@
 		xmlns:tu="clr-namespace:LogProc"
 		Closed="Window_Closed"
 		AllowDrop="True" Drop="Window_Drop" PreviewDragOver="Window_PreviewDragOver"
-        Title="ログ集計支援ソフト(Ver:0.8.47)" Height="500" Width="700">
+        Title="ログ集計支援ソフト(Ver:0.8.48)" Height="500" Width="700">
 	<DockPanel>
 		<Menu DockPanel.Dock="Top">
 			<MenuItem Header="ファイル" Name="miFile">
