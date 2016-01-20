@@ -1,4 +1,4 @@
-﻿ログ集計支援ソフト Ver:0.8.48(rev:26, Build:20160119)
+﻿ログ集計支援ソフト Ver:0.8.49(rev:27, Build:20160121)
 
 このソフトウェアはCTESTWINやZLOGで作成したログファイルを元に、提出用の電子ログの作成を支援するものです。
 質問等ありましたら、山口(JI1LDG, @Yama_LDG)まで。
@@ -49,6 +49,11 @@ URL: https://htmlagilitypack.codeplex.com/
 
 
 ・更新履歴
+Rev:27(0.8.49) 2016/01/21
+zLog DOS compatible textからのログ読み込み処理の修正
+D&D読み込みに"TXT"対応
+出力ログエンコード指定をUTF-8からShift-JISに
+
 Rev:26(0.8.48) 2016/01/19
 関東UHFヤング部門追加
 TXTログ出力機能追加
