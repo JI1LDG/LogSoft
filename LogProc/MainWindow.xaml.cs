@@ -97,7 +97,7 @@ namespace LogProc {
 			sfd.Filter = "ログファイル(*.txt)|*.txt";
 			if (sfd.ShowDialog() == true) {
 				string filename = sfd.FileName;
-				var sw = new System.IO.StreamWriter(filename, false, System.Text.Encoding.UTF8);
+				var sw = new System.IO.StreamWriter(filename, false, System.Text.Encoding.GetEncoding("Shift-JIS"));
 				sw.WriteLine(output);
 				sw.Close();
 			}
@@ -326,7 +326,7 @@ namespace LogProc {
 					if(f.Substring(f.Length - 7) == "set.xml") {
 						ConfTab.SetSetting(f);
 						break;
-					} else if(f.Substring(f.Length - 3) == "lg8" || f.Substring(f.Length - 3) == "txt") {
+					} else if(f.Substring(f.Length - 3) == "lg8" || f.Substring(f.Length - 3) == "txt" || f.Substring(f.Length - 3) == "TXT") {
 						LoadLog ll = new LoadLog();
 						if(!ll.AddFile(f)) {
 							MessageBox.Show("ファイル読み込みに失敗しました。", "通知");

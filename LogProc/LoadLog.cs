@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Microsoft.Win32;
 using System.Windows;
@@ -117,13 +118,16 @@ namespace LogProc {
 
 			try {
 				for(int i = 0;sr.Peek() >= 0;i++) {
-					splits = sr.ReadLine().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+					string str = sr.ReadLine();
 					if(i == 0) {
-						if(splits.Count() != 11) return null;
+						splits = str.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+						if (splits.Count() != 11) return null;
 						for(int j = 0;j < 11;j++) {
 							if(splits[j] != columns[j]) return null;
 						}
 					} else {
+						splits = str.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+						
 						if(splits.Count() == 0) break;
 						int mon = int.Parse(splits[0]);
 						int day = int.Parse(splits[1]);
@@ -131,14 +135,23 @@ namespace LogProc {
 						int hour = time / 100;
 						int min = (time - hour * 100) % 100;
 						DateTime dt = new DateTime(DateTime.Now.Year, mon, day, hour, min, 0);
-						int mhzno = 7;
-						if(splits.Count() == 10) {
-							mhzno = 6;
+						string callsign = splits[3];
+						string scn = splits[4];
+						string rcn = splits[5];
+						int modeno = 7;
+						if(!Regex.IsMatch(splits[modeno], @"[A-Z]*")) {
+							modeno--;
 						}
+						string freq = splits[modeno - 1];
+						string mode = splits[modeno];
+						int pts = int.Parse(splits[modeno + 1]);
+						var m = Regex.Match(str, @"(%%.*%%)");
+						string ope = m.Groups[1].Value;
 						loglist.Add(new LogData() {
-							Date = dt, CallSign = splits[3], SendenContestNo = splits[4],
-							ReceivenContestNo = splits[5], Frequency = splits[mhzno++] + "MHz",
-							Mode = splits[mhzno++], Operator = splits[++mhzno].Replace("%%", ""),
+							Date = dt, CallSign = callsign, SendenContestNo = scn,
+							ReceivenContestNo = rcn, Frequency = freq + "MHz",
+							Mode = mode, Operator = ope,
+							Point = pts,
 							Rem = "", Finden = false, Searchen = false,
 						});
 					}
