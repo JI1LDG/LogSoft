@@ -138,21 +138,30 @@ namespace LogProc {
 						string callsign = splits[3];
 						string scn = splits[4];
 						string rcn = splits[5];
-						int modeno = 7;
-						if(!Regex.IsMatch(splits[modeno], @"[A-Z]*")) {
+						int modeno = 8;
+						if(!Regex.IsMatch(splits[modeno], @"[A-Z]+")) {
 							modeno--;
 						}
 						string freq = splits[modeno - 1];
 						string mode = splits[modeno];
 						int pts = int.Parse(splits[modeno + 1]);
-						var m = Regex.Match(str, @"(%%.*%%)");
-						string ope = m.Groups[1].Value;
+						string ope = "";
+						string rem = "";
+						if (Regex.IsMatch(str, @"(%%.*%%)")) {
+							var m = Regex.Match(str, @"(%%.*%%)(.*)");
+							ope = m.Groups[1].Value;
+							rem = m.Groups[2].Value;
+						} else {
+							for(int ii = modeno + 2;ii < splits.Length; ii++) {
+								rem += splits[ii] + " ";
+							}
+						}
 						loglist.Add(new LogData() {
 							Date = dt, CallSign = callsign, SendenContestNo = scn,
 							ReceivenContestNo = rcn, Frequency = freq + "MHz",
 							Mode = mode, Operator = ope,
 							Point = pts,
-							Rem = "", Finden = false, Searchen = false,
+							Rem = rem, Finden = false, Searchen = false,
 						});
 					}
 				}

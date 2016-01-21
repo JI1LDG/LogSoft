@@ -25,6 +25,7 @@
 					<TextBox Name="tbMainContestNo" CharacterCasing="Upper"/>
 					<Label Content="追加ｺﾝﾃｽﾄﾅﾝﾊﾞ(RST抜き)"/>
 					<TextBox Name="tbSubContestNo" CharacterCasing="Upper" IsEnabled="False"/>
+					<Button Content="コンテストナンバー詳細設定" Name="btScnExtra" Click="btScnExtra_Click"/>
 					<Label Content="最大空中線電力"/>
 					<WrapPanel>
 						<RadioButton Content="定格出力" Name="rbNormal" GroupName="PowerType" IsChecked="True"/>

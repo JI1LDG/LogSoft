@@ -9,6 +9,8 @@ namespace LogProc {
 	/// SettingTab.xaml の相互作用ロジック
 	/// </summary>
 	public partial class SettingTab : UserControl {
+		private string extra;
+
 		private IDefine[] _plg;
 		public IDefine[] Plugins {
 			private get { return _plg; }
@@ -28,6 +30,7 @@ namespace LogProc {
 			InitializeComponent();
 			cbAutoOperator.IsChecked = true;
 			cbContestName.IsEnabled = false;
+			extra = "";
 		}
 
 		public Setting SetSetting() {
@@ -103,6 +106,7 @@ namespace LogProc {
 				}
 				break;
 			}
+			extra = (st.ScnExtra == null) ? "" : st.ScnExtra;
 			tbMainContestNo.Text = st.ContestNo;
 			tbSubContestNo.Text = st.SubContestNo;
 			rbNormal.IsChecked = st.PowerType == "定格出力" ? true : false;
@@ -141,6 +145,7 @@ namespace LogProc {
 			st.Coefficient = cbCoefficient.IsChecked == true ? true : false;
 			st.ContestNo = tbMainContestNo.Text;
 			st.SubContestNo = tbSubContestNo.Text;
+			st.ScnExtra = extra;
 			st.PowerType = rbNormal.IsChecked == true ? "定格出力" : "実測出力";
 			st.PowerValue = cbPowerValue.Text;
 			st.AutoOperatorEdit = cbAutoOperator.IsChecked == true ? true : false;
@@ -287,6 +292,12 @@ namespace LogProc {
 			Equip eq = new Equip();
 			eq.ShowDialog();
 			if(eq.isChanged) tbEquip.Text = eq.EquipStr;
+		}
+
+		private void btScnExtra_Click(object sender, RoutedEventArgs e) {
+			ContestNo cn = new ContestNo(extra);
+			cn.ShowDialog();
+			if (cn.retEx != null) extra = cn.retEx;
 		}
 	}
 }

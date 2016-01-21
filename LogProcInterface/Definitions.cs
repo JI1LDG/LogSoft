@@ -53,6 +53,11 @@ namespace LogProc {
 			}
 		}
 
+		public class ScnData {
+			public string Frequency { get; set; }
+			public string Scn { get; set; }
+		}
+
 		public class EquipData {
 			public string Name { get; set; }
 			public string Rem { get; set; }
@@ -146,6 +151,7 @@ namespace LogProc {
 			public bool Coefficient { get; set; }
 			public string ContestNo { get; set; }
 			public string SubContestNo { get; set; }
+			public string ScnExtra { get; set; }
 			public bool IsSubCN { get; set; }
 			public string PowerType { get; set; }
 			private string _pwvl;
@@ -216,6 +222,10 @@ namespace LogProc {
 				tmp.Add(new ErrorReason(5,
 					"UnexistedFrequency",
 					"周波数が不正です。ログに出力されません。",
+					false));
+				tmp.Add(new ErrorReason(5,
+					"OmakuniExceptJA",
+					"外国局は得点の対象外です。",
 					false));
 				tmp.Add(new ErrorReason(4, 
 					"UnmatchedCnWithAddress", 

@@ -1,0 +1,31 @@
+﻿<Window x:Class="LogProc.ContestNo"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LogProc"
+        mc:Ignorable="d"
+        Title="ContestNo" Height="300" Width="400">
+	<DockPanel>
+		<DockPanel DockPanel.Dock="Bottom">
+			<DockPanel DockPanel.Dock="Top">
+				<Label Content="ｺﾝﾃｽﾄﾅﾝﾊﾞ" DockPanel.Dock="Left"/>
+				<ComboBox Name="cbFreq" MinWidth="100" DockPanel.Dock="Left"/>
+				<Button Name="btAdd" Content="追加" DockPanel.Dock="Right" Click="btAdd_Click"/>
+				<TextBox Name="tbScn" MinWidth="100" CharacterCasing="Upper"/>
+			</DockPanel>
+			<WrapPanel DockPanel.Dock="Right">
+				<Button Content="キャンセル" Name="btCancel" Click="btCancel_Click"/>
+				<Button Content="編集終了" Name="btConfirm" Click="btConfirm_Click"/>
+			</WrapPanel>
+			<Label/>
+		</DockPanel>
+		<Label DockPanel.Dock="Top" Content="周波数ごとのコンテストナンバ設定"/>
+		<DataGrid Name="dgRcn" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" CanUserAddRows="False" Height="Auto" MinHeight="50">
+			<DataGrid.Columns>
+				<DataGridTextColumn Binding="{Binding Frequency}" Header="周波数"/>
+				<DataGridTextColumn Binding="{Binding Scn}" Header="コンテストナンバ"/>
+			</DataGrid.Columns>
+		</DataGrid>
+	</DockPanel>
+</Window>

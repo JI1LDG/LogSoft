@@ -84,6 +84,7 @@ namespace LogProc {
 			if(sheetType) opLog += "<LOGSHEET TYPE=CTESTWIN>\r\n";
 			opLog += "mon day time callsign        sent       rcvd       multi  MHz  mode pts memo\r\n";
 				foreach(var l in Work.Log) {
+				if (l.Point == 0) continue;
 					bool mul = false;
 					bool found = false;
 					string areano = Plugins.GetContestAreaNoFromRcn(l);

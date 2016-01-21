@@ -242,6 +242,7 @@ namespace LogProc {
 		private void SetNowIntersets() {
 			for(int i = 0;i < Intersets.Count;i++) {
 				if(Intersets[i].Def.ContestName == Work.Config.ContestName) {
+					//Setting load cancel de ochiru
 					nowItst = Intersets[i];
 					return;
 				}
@@ -249,7 +250,9 @@ namespace LogProc {
 		}
 
 		private void btLoadSetting_Click(object sender, RoutedEventArgs e) {
-			Work.Config = ConfTab.SetSetting();
+			var ld = ConfTab.SetSetting();
+			if (ld == null) return;
+			Work.Config = ld;
 			SetNowIntersets();
             UpdateData();
 		}
@@ -297,7 +300,7 @@ namespace LogProc {
 		}
 
 		private void miVersionInfo_Click(object sender, RoutedEventArgs e) {
-			MessageBox.Show("ログ集計支援ソフト（名前はまだない）\r\nVer:0.8.49(Build:20160121)\r\nAuthor/Developer: JI1LDG(@Yama_LDG)\r\nForm Designer / Adviser: JI1EPL\r\n無線局情報の検索に総務省の「無線局等情報検索(http://www.tele.soumu.go.jp/musen/SearchServlet?pageID=1)」を使用しています。", "バージョン情報");
+			MessageBox.Show("ログ集計支援ソフト（名前はまだない）\r\nVer:0.8.50-pre(Build:20160121)\r\nAuthor/Developer: JI1LDG(@Yama_LDG)\r\nForm Designer / Adviser: JI1EPL\r\n無線局情報の検索に総務省の「無線局等情報検索(http://www.tele.soumu.go.jp/musen/SearchServlet?pageID=1)」を使用しています。", "バージョン情報");
 		}
 
 		private void miDBInit_Click(object sender, RoutedEventArgs e) {

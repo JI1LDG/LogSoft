@@ -258,12 +258,19 @@ namespace LogProc {
 			private void CheckScn() {
 				string chk = SearchUtil.GetRSTVal(Log)[0];
 				var cn = (SubSelecter ? Config.ContestNo : Config.SubContestNo);
+				var excn = ContestNo.GetVal(Config.ScnExtra, Log.Frequency);
+				if (excn != null) cn = excn;
 				if (chk != cn || SearchUtil.CnHasPower(Log.SendenContestNo) == false) {
 					ErrorReason.SetError(_er, "InvalidSentCn");
 				}
 			}
 
 			private void CheckRcn() {
+				if (!SearchUtil.IsJPCallSign(Log.CallSign)) {
+					Log.Point = 0;
+					ErrorReason.SetError(_er, "OmakuniExceptJA");
+					return;
+				}
 				if (SearchUtil.CnHasPower(Log.ReceivenContestNo) == false) {
 					ErrorReason.SetError(_er, "InvalidReceivedCn");
 				}

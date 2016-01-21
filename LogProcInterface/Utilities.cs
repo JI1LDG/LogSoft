@@ -74,7 +74,7 @@ namespace LogProc {
 			public static string GetPrefno(LogData Log, bool AcagMode = false) {
 				string res = GetAreano(Log);
 				if (AcagMode) {
-					return res.Substring(0, 2);
+					return res.Substring(0, 2);//k7zoo america callsign
 				} else {
 					return res;
 				}

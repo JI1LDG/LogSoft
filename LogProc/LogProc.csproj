@@ -103,6 +103,9 @@
     <Compile Include="ContestData\AllKanagawa.cs" />
     <Compile Include="ContestData\FieldDay.cs" />
     <Compile Include="ContestData\KantoUHF.cs" />
+    <Compile Include="ContestNo.xaml.cs">
+      <DependentUpon>ContestNo.xaml</DependentUpon>
+    </Compile>
     <Compile Include="EditLog.xaml.cs">
       <DependentUpon>EditLog.xaml</DependentUpon>
     </Compile>
@@ -122,6 +125,10 @@
     </Compile>
     <Compile Include="Utilities\BinaryStream.cs" />
     <Page Include="ConfigTab.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ContestNo.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
