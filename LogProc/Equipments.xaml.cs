@@ -89,7 +89,7 @@ namespace LogProc {
 				return;
 			}
 			foreach(var data in eqp) {
-				gEquip.Add(new EquipGrid() { isEquipen = false, Data = data, });
+				gEquip.Add(new EquipGrid() { IsEquiped = false, Data = data, });
 			}
 		}
 
@@ -136,7 +136,7 @@ namespace LogProc {
 			List<EquipNum> len = new List<EquipNum>();
 			bool ok;
 			foreach(var eq in gEquip) {
-				if(!eq.isEquipen) continue;
+				if(!eq.IsEquiped) continue;
 				ok = false;
 				foreach(var l in len) {
 					if(l.Name == eq.Data.Name) {

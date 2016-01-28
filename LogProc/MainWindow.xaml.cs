@@ -54,9 +54,9 @@ namespace LogProc {
 			dgLog.ItemsSource = Work.Log;
 			if(Work.Config != null) lbSettingConfigen.Content = "";
 			foreach(var l in Work.Log) {
-				if(!l.Searchen) unsearchen++;
-				if(!l.Finden) unfinden++;
-				if(!l.Rate0) erroren++;
+				if(!l.IsSearched) unsearchen++;
+				if(!l.IsFinded) unfinden++;
+				if(!l.IsRate0) erroren++;
 			}
 			lbUnsearchenLogNum.Content = unsearchen;
 			lbUnavailenLogNum.Content = unfinden;
@@ -160,8 +160,8 @@ namespace LogProc {
 
 			MenuItem mi = new MenuItem();
 			mi.Click += SearchByWeb;
-			mi.Header = "Webで検索(" + ld.CallSign + ")";
-			mi.CommandParameter = defSearch.GetCallSignBesideStroke(ld.CallSign);
+			mi.Header = "Webで検索(" + ld.Callsign + ")";
+			mi.CommandParameter = Callsign.GetRemovedStroke(ld.Callsign);
 			cm.Items.Add(mi);
 
 			MenuItem miLogEdit = new MenuItem();
@@ -209,7 +209,7 @@ namespace LogProc {
 				AccessStationSearch(cp.ToString());
 			} else if(cp is ObservableCollection<LogData>) {
 				foreach(var ld in cp as ObservableCollection<LogData>) {
-					AccessStationSearch(ld.CallSign);
+					AccessStationSearch(ld.Callsign);
 				}
 			}
 			//throw new NotImplementedException();
@@ -236,12 +236,12 @@ namespace LogProc {
 		}
 
 		private void AccessStationSearch(string CallSign) {
-			System.Diagnostics.Process.Start("http://www.tele.soumu.go.jp/musen/SearchServlet?SC=1&pageID=3&SelectID=1&CONFIRM=0&SelectOW=01&IT=&HC=&HV=&FF=&TF=&HZ=3&NA=&MA=" + defSearch.GetCallSignBesideStroke(CallSign) + "&DFY=&DFM=&DFD=&DTY=&DTM=&DTD=&SK=2&DC=100&as_fid=2I6vX7ugLE0ekrPjPfMD#result");
+			System.Diagnostics.Process.Start("http://www.tele.soumu.go.jp/musen/SearchServlet?SC=1&pageID=3&SelectID=1&CONFIRM=0&SelectOW=01&IT=&HC=&HV=&FF=&TF=&HZ=3&NA=&MA=" + Callsign.GetRemovedStroke(CallSign) + "&DFY=&DFM=&DFD=&DTY=&DTM=&DTD=&SK=2&DC=100&as_fid=2I6vX7ugLE0ekrPjPfMD#result");
 		}
 
 		private void SetNowIntersets() {
 			for(int i = 0;i < Intersets.Count;i++) {
-				if(Intersets[i].Def.ContestName == Work.Config.ContestName) {
+				if(Intersets[i].Def.contestName == Work.Config.ContestName) {
 					//Setting load cancel de ochiru
 					nowItst = Intersets[i];
 					return;
@@ -275,7 +275,7 @@ namespace LogProc {
 			sw.ShowDialog();
 			UpdateData();
 			if(ConfTab.cbAutoOperator.IsChecked == true) {
-				ConfTab.tbOperator.Text = SearchUtil.GetOpList(Work);
+				ConfTab.tbOperator.Text = Utils.GetOpList(Work);
 				ConfTab.cbAutoOperator.IsChecked = false;
 			}
 		}

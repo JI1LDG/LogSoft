@@ -8,38 +8,38 @@ namespace LogProc {
 		}
 
 		public interface IDefine {
-			string ContestName { get; }
-			bool Coefficient { get; }
-			bool IsSubCN { get; }
-			string Oath { get; }
-			List<CategoryData> ContestCategolies { get; }
-			ContestPower AllowenPowerInCategoryCode(string Code);
-			string GetCategoryCodeByPower(string Code, ContestPower Power);
-			string GetCategoryCodeDivPower(string Code, ContestPower Power);
+			string contestName { get; }
+			bool isCoefficientEnabled { get; }
+			bool isSubCnEnabled { get; }
+			string oath { get; }
+			List<CategoryData> contestCategories { get; }
+			ContestPower GetPowerAllowed(string code);
+			string GetCodeWithPower(string code, ContestPower power);
+			string GetCodeDivPower(string code, ContestPower power);
 		}
 
 		public interface ISearch {
-			LogData Log { get; set; }
-			StationData Station { get; set; }
-			Setting Config { get; set; }
-			string AnvStation { get; set; }
-			string ContestName { get; }
-			List<Area> MainArea { get; }
-			List<Area> SubArea { get; }
+			LogData log { get; set; }
+			StationData station { get; set; }
+			Setting config { get; set; }
+			string anvStr { get; set; }
+			string contestName { get; }
+			List<Area> listMainArea { get; }
+			List<Area> listSubArea { get; }
 			bool isErrorAvailable { get; }
-			void DoCheck();
-			void SetErrorStr();
+			void check();
+			void setErrorStr();
 		}
 
 		public interface ISummery {
-			string ContestName { get; }
-			Setting Config { get; set; }
-			bool isEditenScore { get; }
-			List<Multiply> Multi { get; set; }
-			int FreqNum { get; set; }
-			int AreaMax { get; set; }
-			string GetContestAreaNoFromRcn(LogData log);
-			string GetScoreStr();
+			string contestName { get; }
+			Setting config { get; set; }
+			bool isScoreEdited { get; }
+			List<Multiply> listMulti { get; set; }
+			int freqNum { get; set; }
+			int areaMax { get; set; }
+			string getAreano(LogData log);
+			string getScoreStr();
 		}
 	}
 }

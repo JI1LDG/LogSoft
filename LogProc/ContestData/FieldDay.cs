@@ -11,10 +11,10 @@ namespace LogProc {
 		}
 
 		public class ContestDefine : IDefine {
-			public string Oath { get { return "私は，JARL制定のコンテスト規約および電波法令にしたがい運用した結果，ここに提出するサマリーシートおよびログシートなどが事実と相違ないものであることを，私の名誉において誓います。"; } }
-			public bool Coefficient { get { return true; } }
-			public bool IsSubCN { get { return true; } }
-			public string ContestName { get { return Property.ContestName; } }
+			public string oath { get { return "私は，JARL制定のコンテスト規約および電波法令にしたがい運用した結果，ここに提出するサマリーシートおよびログシートなどが事実と相違ないものであることを，私の名誉において誓います。"; } }
+			public bool isCoefficientEnabled { get { return true; } }
+			public bool isSubCnEnabled { get { return true; } }
+			public string contestName { get { return Property.ContestName; } }
 			private List<CategoryData> _contestCategolies = new List<CategoryData>() {
 			new CategoryData(){
 				Name = "電話部門シングルオペオールバンド",
@@ -177,9 +177,9 @@ namespace LogProc {
 				Code = "XMJ",
 			},
 		};
-			public List<CategoryData> ContestCategolies { get { return _contestCategolies; } }
+			public List<CategoryData> contestCategories { get { return _contestCategolies; } }
 
-			public ContestPower AllowenPowerInCategoryCode(string Code) {
+			public ContestPower GetPowerAllowed(string Code) {
 				if(Code[0] == 'P') return ContestPower.TwentyTen;
 				else {
 					if(Code == "CP" || Code == "XP") return ContestPower.Five;
@@ -187,156 +187,141 @@ namespace LogProc {
 				}
 			}
 
-			public string GetCategoryCodeByPower(string Code, ContestPower Power) {
-				return Code;
+			public string GetCodeWithPower(string code, ContestPower power) {
+				return code;
 			}
 
-			public string GetCategoryCodeDivPower(string Code, ContestPower Power) {
-				return Code;
+			public string GetCodeDivPower(string code, ContestPower power) {
+				return code;
 			}
 		}
 
 		public class SearchLog : ISearch {
-			private bool SubSelecter { get { return defCTESTWIN.GetFreqNum(Log.Frequency) < defCTESTWIN.GetFreqNum("2400MHz"); } }
+			private bool SubSelecter { get { return Freq.CnvTofrqnum(log.Freq) < Freq.CnvTofrqnum("2400MHz"); } }
 			private List<Area> _mainArea;
-			public List<Area> MainArea {
+			public List<Area> listMainArea {
 				get {
 					if (_mainArea == null) {
-						_mainArea = SearchUtil.GetAreaListFromFile("Prefectures");
+						_mainArea = Areano.GetList("Prefectures");
 					}
 					return _mainArea;
 				}
 			}
 			private List<Area> _subArea;
-			public List<Area> SubArea {
+			public List<Area> listSubArea {
 				get {
 					if (_subArea == null) {
-						_subArea = SearchUtil.GetAreaListFromFile("ACAG");
+						_subArea = Areano.GetList("ACAG");
 					}
 					return _subArea;
 				}
 			}
-			public string ContestName { get { return Property.ContestName; } }
-			public LogData Log { get; set; }
-			public StationData Station { get; set; }
-			public Setting Config { get; set; }
-			public string AnvStation { get; set; }
+			public string contestName { get { return Property.ContestName; } }
+			public LogData log { get; set; }
+			public StationData station { get; set; }
+			public Setting config { get; set; }
+			public string anvStr { get; set; }
 			public bool isErrorAvailable {
 				get {
-					foreach (var e in _er) {
+					foreach (var e in listErr.Values) {
 						if (e.IsSet) return true;
 					}
 					return false;
 				}
 			}
 
-			private List<ErrorReason> _er;
+			private Dictionary<string, ErrorReason> listErr;
 
-			public void DoCheck() {
-				_er = ErrorReason.GetInitial();
+			public void check() {
+				listErr = ErrorReason.GetInitial();
+				CheckLog();
 				CheckScn();
 				CheckRcn();
-				SetErrorStr();
+				setErrorStr();
 			}
 
 			private void CheckLog() {
-				SearchUtil.AnvstaChk(Log.CallSign, AnvStation, _er, Station);
-				if (Station == null) {
-					ErrorReason.SetError(_er, "FailedToGetData");
+				Anv.Check(log.Callsign, anvStr, listErr, station);
+				if (station == null) {
+					ErrorReason.Set(listErr, Reason.GetDataFailed.ToString());
 				}
-				Log.Point = 1;
-				switch (Log.Frequency) {
+				log.Point = 1;
+				switch (log.Freq) {
 					case "1.9MHz": case "10MHz":
 					case "18MHz": case "24MHz":
-						Log.Point = 0;
-						ErrorReason.SetError(_er, "OutOfFrequency");
+						log.Point = 0;
+						ErrorReason.Set(listErr, Reason.OutOfFreq.ToString());
 						break;
 					default: break;
 				}
 			}
 
 			private void CheckScn() {
-				string chk = SearchUtil.GetRSTVal(Log)[0];
-				var cn = (SubSelecter ? Config.ContestNo : Config.SubContestNo);
-				var excn = ContestNo.GetVal(Config.ScnExtra, Log.Frequency);
-				if (excn != null) cn = excn;
-				if (chk != cn || SearchUtil.CnHasPower(Log.SendenContestNo) == false) {
-					ErrorReason.SetError(_er, "InvalidSentCn");
-				}
+				Contestno.CheckSentCn(log, SubSelecter ? config.Contestno : config.SubContestno, ContestNo.GetVal(config.SentCnExtra, log.Freq), true, listErr);
 			}
 
 			private void CheckRcn() {
-				if (!SearchUtil.IsJPCallSign(Log.CallSign)) {
-					Log.Point = 0;
-					ErrorReason.SetError(_er, "OmakuniExceptJA");
+				if (!Callsign.IsJACallsign(log.Callsign)) {
+					log.Point = 0;
+					ErrorReason.Set(listErr, Reason.OmakuniNonJA.ToString());
 					return;
 				}
-				if (SearchUtil.CnHasPower(Log.ReceivenContestNo) == false) {
-					ErrorReason.SetError(_er, "InvalidReceivedCn");
+				if (Contestno.HasPower(log.ReceivedCn) == false) {
+					ErrorReason.Set(listErr, Reason.InvalidReceivedCn.ToString());
 				}
 
 				//59##L
-				var prefno = SearchUtil.GetPrefno(Log, SubSelecter ? false : true);
-				var hasStroke = SearchUtil.CallsignHasStroke(Log.CallSign);
-				//11 -> 1
-				var arearegion = SearchUtil.GetRegionFromCn(prefno);
-				//JA#YPZ JA1YPZ/#
-				var callregion = SearchUtil.GetRegionFromCallSign(Log.CallSign, hasStroke);
-				var areano = SearchUtil.GetAreano(Log);
-				var areanoExists = SearchUtil.AreanoExists(SubSelecter ? MainArea : SubArea, areano);
-				var stationAddress = SearchUtil.GetStationAddressList(Station);
-				var staAddrStr = SearchUtil.ConvToStrFromList(SearchUtil.GetAreanoFromAddressList(stationAddress, MainArea));
-				var stationAreano = SearchUtil.GetAreanoFromStation(Station, SubSelecter ? MainArea : SubArea);
-				var staAreanoStr = SearchUtil.ConvToStrFromList(stationAreano);
-				var freqchk = SearchUtil.FrequencyChk(Log.Frequency);
-				if (freqchk == false) {
-					ErrorReason.SetError(_er, "UnexistedFrequency");
+				var hasStroke = Callsign.HasStroke(log.Callsign);
+				var areano = Contestno.GetAreano(log);
+				var stationAreano = Areano.GetFromStation(station, SubSelecter ? listMainArea : listSubArea);
+				if (!Freq.IsBeen(log.Freq)) {
+					ErrorReason.Set(listErr, Reason.InvalidFreq.ToString());
 				}
-				if (arearegion != callregion) {
-					ErrorReason.SetError(_er, "UnmatchedRegion");
+				if (Contestno.GetRegion(Contestno.GetPrefno(log, SubSelecter ? false : true))  != Callsign.GetRegion(log.Callsign, hasStroke)) {
+					ErrorReason.Set(listErr, Reason.RegionUnmatches.ToString());
 				}
-				if (SearchUtil.AreanoMatches(areano, stationAreano) == false && Station != null && hasStroke == false) {
-					ErrorReason.SetError(_er, "UnmatchedCnWithAddress", staAreanoStr);
+				if (!Station.IsMatched(areano, stationAreano) && station != null && !hasStroke) {
+					ErrorReason.Set(listErr, Reason.AddressUnmatches.ToString(), Utils.ConvTostrarrFromList(stationAreano));
 				}
-				if (areanoExists == false) {
-					ErrorReason.SetError(_er, "UnexistedAreanoWithCn", staAddrStr);
+				if (!Areano.IsBeen(SubSelecter ? listMainArea : listSubArea, areano)) {
+					ErrorReason.Set(listErr, Reason.ReceivedCnUnexists.ToString(), Utils.ConvTostrarrFromList(Areano.GetFromList(Station.GetList(station), listMainArea)));
 				}
 			}
 
-			public void SetErrorStr() {
-				Log.FailedStr = ErrorReason.GetFailedStr(_er);
+			public void setErrorStr() {
+				log.FailedStr = ErrorReason.GetFailedStr(listErr);
 			}
 		}
 
 		public class LogSummery : ISummery {
-			public string ContestName { get { return Property.ContestName; } }
-			public Setting Config { get; set; }
-			public bool isEditenScore { get { return true; } }
-			public List<Multiply> Multi { get; set; }
-			public int FreqNum { get; set; }
-			public int AreaMax { get; set; }
+			public string contestName { get { return Property.ContestName; } }
+			public Setting config { get; set; }
+			public bool isScoreEdited { get { return true; } }
+			public List<Multiply> listMulti { get; set; }
+			public int freqNum { get; set; }
+			public int areaMax { get; set; }
 
-			public string GetContestAreaNoFromRcn(LogData Log) {
-				return SearchUtil.GetAreano(Log);
+			public string getAreano(LogData Log) {
+				return Contestno.GetAreano(Log);
 			}
 
-			public string GetScoreStr() {
+			public string getScoreStr() {
 				string output = "";
 				int totalLog = 0;
 				int totalPts = 0;
 				int totalMulti = 0;
-				for(int i = 0;i < FreqNum;i++) {
+				for(int i = 0;i < freqNum;i++) {
 					int multiNum = 0;
 					int logNum = 0;
 					int ptsNum = 0;
-					foreach(var m in Multi) {
-						if(m.Frequency != i) continue;
+					foreach(var m in listMulti) {
+						if(m.Freq != i) continue;
 						multiNum++;
 						logNum += m.Num;
 						ptsNum += m.Point;
 					}
 					if(multiNum == 0) continue;
-					output += "<SCORE BAND=" + defCTESTWIN.GetFreqString((defCTESTWIN.FreqStr)i) + ">";
+					output += "<SCORE BAND=" + Freq.CnvTostr((FreqStr)i) + ">";
 					output += logNum + "," + ptsNum + "," + multiNum + "</SCORE>\r\n";
 					totalLog += logNum;
 					totalPts += ptsNum;
@@ -344,7 +329,7 @@ namespace LogProc {
 				}
 				if(totalLog == 0) return "";
 				int coeff;
-				if(Config.Coefficient) coeff = 2;
+				if(config.IsCoefficientEnabled) coeff = 2;
 				else coeff = 1;
 				output += "<SCORE BAND=TOTAL>" + totalLog + "," + totalPts + "," + totalMulti + "</SCORE>\r\n";
 				output += "<FDCOEFF>" + coeff + "</FDCOEFF>\r\n";

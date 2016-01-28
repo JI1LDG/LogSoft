@@ -19,7 +19,7 @@ namespace LogProc {
 				cbContestName.Items.Clear();
 				foreach(var dp in _plg) {
 					cbContestName.Items.Add(new ComboBoxItem() {
-						Content = dp.ContestName,
+						Content = dp.contestName,
 					});
 				}
 				cbContestName.IsEnabled = true;
@@ -81,40 +81,40 @@ namespace LogProc {
 
 		public void DoLoad(Setting st) {
 			foreach(var dp in Plugins) {
-				if(dp.ContestName != st.ContestName) continue;
+				if(dp.contestName != st.ContestName) continue;
 				cbContestName.Text = st.ContestName;
 				FillCategory(st.ContestName);
-				foreach(var cc in dp.ContestCategolies) {
+				foreach(var cc in dp.contestCategories) {
 					if(cc.Name != st.CategoryName) continue;
-					cbCategory.Text = "(" + dp.GetCategoryCodeDivPower(st.CategoryCode, GetContestPowerEnumFromStr(st.CategoryPower)) + ")" + st.CategoryName;
-					ChangeEnablalContestPower(dp.AllowenPowerInCategoryCode(cc.Code));
+					cbCategory.Text = "(" + dp.GetCodeDivPower(st.CategoryCode, GetContestPowerEnumFromStr(st.CategoryPower)) + ")" + st.CategoryName;
+					ChangeEnablalContestPower(dp.GetPowerAllowed(cc.Code));
 					CheckCategoryPowerByConvertenStr(st.CategoryPower);
 					break;
 				}
-				if(dp.Coefficient) {
+				if(dp.isCoefficientEnabled) {
 					cbCoefficient.IsEnabled = true;
-					cbCoefficient.IsChecked = st.Coefficient;
+					cbCoefficient.IsChecked = st.IsCoefficientEnabled;
 				} else {
 					cbCoefficient.IsEnabled = false;
 					cbCoefficient.IsChecked = false;
 				}
-				if(dp.IsSubCN) {
+				if(dp.isSubCnEnabled) {
 					tbSubContestNo.IsEnabled = true;
-					tbSubContestNo.Text = st.SubContestNo;
+					tbSubContestNo.Text = st.SubContestno;
 				} else {
 					tbSubContestNo.IsEnabled = false;
 				}
 				break;
 			}
-			extra = (st.ScnExtra == null) ? "" : st.ScnExtra;
-			tbMainContestNo.Text = st.ContestNo;
-			tbSubContestNo.Text = st.SubContestNo;
+			extra = (st.SentCnExtra == null) ? "" : st.SentCnExtra;
+			tbMainContestNo.Text = st.Contestno;
+			tbSubContestNo.Text = st.SubContestno;
 			rbNormal.IsChecked = st.PowerType == "定格出力" ? true : false;
 			rbReal.IsChecked = rbNormal.IsChecked == true ? false : true;
-			cbPowerValue.Text = st.PowerValue;
-			cbAutoOperator.IsChecked = st.AutoOperatorEdit;
+			cbPowerValue.Text = st.PowerVal;
+			cbAutoOperator.IsChecked = st.IsAutoOperatorEditEnabled;
 			tbOperator.Text = st.Operator;
-			tbCallSign.Text = st.CallSign;
+			tbCallSign.Text = st.Callsign;
 			tbZipCode.Text = st.ZipCode;
 			tbAddress.Text = st.Address;
 			tbPhone.Text = st.Phone;
@@ -124,35 +124,35 @@ namespace LogProc {
 			cbLincenserLicense.Text = st.LicenserLicense;
 			tbPlace.Text = st.Place;
 			tbSupply.Text = st.Supply;
-			tbEquip.Text = st.Equipment;
+			tbEquip.Text = st.Equip;
 			tbComment.Text = st.Comment;
 			tbOath.Text = st.Oath;
 		}
 
 		private Setting DoSave() {
 			Setting st = new Setting();
-			st.Version = "0.8.1";
+			st.Version = "0.8.50";
 
 			st.ContestName = cbContestName.Text;
 			foreach(var dp in Plugins) {
-				if(dp.ContestName != st.ContestName) continue;
-				st.CategoryCode = dp.GetCategoryCodeByPower(cbCategory.Text.Substring(1, cbCategory.Text.IndexOf(")") - 1), ConvertCategoryPowerToEnum());
-				st.IsSubCN = dp.IsSubCN;
+				if(dp.contestName != st.ContestName) continue;
+				st.CategoryCode = dp.GetCodeWithPower(cbCategory.Text.Substring(1, cbCategory.Text.IndexOf(")") - 1), ConvertCategoryPowerToEnum());
+				st.IsSubCnEnabled = dp.isSubCnEnabled;
                 break;
 			}
 			st.CategoryName = cbCategory.Text.Substring(cbCategory.Text.IndexOf(")") + 1);
 			st.CategoryPower = ConvertCategoryPowerToStr();
-			st.Coefficient = cbCoefficient.IsChecked == true ? true : false;
-			st.ContestNo = tbMainContestNo.Text;
-			st.SubContestNo = tbSubContestNo.Text;
-			st.ScnExtra = extra;
+			st.IsCoefficientEnabled = cbCoefficient.IsChecked == true ? true : false;
+			st.Contestno = tbMainContestNo.Text;
+			st.SubContestno = tbSubContestNo.Text;
+			st.SentCnExtra = extra;
 			st.PowerType = rbNormal.IsChecked == true ? "定格出力" : "実測出力";
-			st.PowerValue = cbPowerValue.Text;
-			st.AutoOperatorEdit = cbAutoOperator.IsChecked == true ? true : false;
-			if(!st.AutoOperatorEdit) {
+			st.PowerVal = cbPowerValue.Text;
+			st.IsAutoOperatorEditEnabled = cbAutoOperator.IsChecked == true ? true : false;
+			if(!st.IsAutoOperatorEditEnabled) {
 				st.Operator = tbOperator.Text;
 			}
-			st.CallSign = tbCallSign.Text;
+			st.Callsign = tbCallSign.Text;
 			st.ZipCode = tbZipCode.Text;
 			st.Address = tbAddress.Text;
 			st.Phone = tbPhone.Text;
@@ -162,7 +162,7 @@ namespace LogProc {
 			st.LicenserLicense = cbLincenserLicense.Text;
 			st.Place = tbPlace.Text;
 			st.Supply = tbSupply.Text;
-			st.Equipment = tbEquip.Text;
+			st.Equip = tbEquip.Text;
 			st.Comment = tbComment.Text;
 			st.Oath = tbOath.Text;
 
@@ -223,15 +223,15 @@ namespace LogProc {
 			if(selected == null) return;
 			FillCategory(selected.Content as string);
 			foreach(var dp in Plugins) {
-				if(dp.ContestName != selected.Content as string) continue;
-				if(dp.Coefficient) {
+				if(dp.contestName != selected.Content as string) continue;
+				if(dp.isCoefficientEnabled) {
 					cbCoefficient.IsEnabled = true;
 					cbCoefficient.IsChecked = true;
 				} else {
 					cbCoefficient.IsEnabled = false;
 					cbCoefficient.IsChecked = false;
 				}
-				if(dp.IsSubCN) {
+				if(dp.isSubCnEnabled) {
 					tbSubContestNo.IsEnabled = true;
 				} else {
 					tbSubContestNo.IsEnabled = false;
@@ -245,9 +245,9 @@ namespace LogProc {
 			var selected = cb.SelectedItem as ComboBoxItem;
 			if(selected == null) return;
 			foreach(var dp in Plugins) {
-				if(dp.ContestName != ((cbContestName as ComboBox).SelectedItem as ComboBoxItem).Content as string) continue;
+				if(dp.contestName != ((cbContestName as ComboBox).SelectedItem as ComboBoxItem).Content as string) continue;
 				string cont = selected.Content as string;
-				ChangeEnablalContestPower(dp.AllowenPowerInCategoryCode(cont.Substring(1, cont.IndexOf(")") - 1)));
+				ChangeEnablalContestPower(dp.GetPowerAllowed(cont.Substring(1, cont.IndexOf(")") - 1)));
 				break;
 			}
 		}
@@ -258,9 +258,9 @@ namespace LogProc {
 			ChangeEnablalContestPower(ContestPower.None);
 			cbCategory.Items.Clear();
 			foreach(var dp in Plugins) {
-				if(dp.ContestName != ContestName) continue;
-				tbOath.Text = dp.Oath;
-				foreach(var cc in dp.ContestCategolies) {
+				if(dp.contestName != ContestName) continue;
+				tbOath.Text = dp.oath;
+				foreach(var cc in dp.contestCategories) {
 					cbCategory.Items.Add(new ComboBoxItem() {
 						Content = "(" + cc.Code + ")" + cc.Name,
 					});

@@ -64,10 +64,10 @@
 			<DataGrid Grid.Column="2" Name="dgLog" AutoGenerateColumns="False" ItemsSource="{Binding Work.Log, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Language="ja-JP" PreviewMouseRightButtonDown="dgLog_PreviewMouseRightButtonDown">
 				<DataGrid.Columns>
 					<DataGridTextColumn Header="日時" Binding="{Binding Date, StringFormat=g}"/>
-					<DataGridTextColumn Header="コールサイン" Binding="{Binding CallSign}"/>
-					<DataGridTextColumn Header="自局CN" Binding="{Binding SendenContestNo}"/>
-					<DataGridTextColumn Header="相手CN" Binding="{Binding ReceivenContestNo}"/>
-					<DataGridTextColumn Header="周波数" Binding="{Binding Frequency}"/>
+					<DataGridTextColumn Header="コールサイン" Binding="{Binding Callsign}"/>
+					<DataGridTextColumn Header="自局CN" Binding="{Binding SentCn}"/>
+					<DataGridTextColumn Header="相手CN" Binding="{Binding ReceivedCn}"/>
+					<DataGridTextColumn Header="周波数" Binding="{Binding Freq}"/>
 					<DataGridTextColumn Header="モード" Binding="{Binding Mode}"/>
 					<DataGridTextColumn Header="オペレータ" Binding="{Binding Operator}"/>
 					<DataGridTextColumn Header="コメント" Binding="{Binding Rem}"/>
@@ -76,22 +76,22 @@
 				<DataGrid.ItemContainerStyle>
 					<Style TargetType="DataGridRow">
 						<Style.Triggers>
-							<DataTrigger Binding="{Binding Rate0, UpdateSourceTrigger=PropertyChanged}" Value="True">
+							<DataTrigger Binding="{Binding IsRate0, UpdateSourceTrigger=PropertyChanged}" Value="True">
 								<Setter Property="Background" Value="White"/>
 							</DataTrigger>
-							<DataTrigger Binding="{Binding Rate1, UpdateSourceTrigger=PropertyChanged}" Value="True">
+							<DataTrigger Binding="{Binding IsRate1, UpdateSourceTrigger=PropertyChanged}" Value="True">
 								<Setter Property="Background" Value="Azure"/>
 							</DataTrigger>
-							<DataTrigger Binding="{Binding Rate2, UpdateSourceTrigger=PropertyChanged}" Value="True">
+							<DataTrigger Binding="{Binding IsRate2, UpdateSourceTrigger=PropertyChanged}" Value="True">
 								<Setter Property="Background" Value="Aqua"/>
 							</DataTrigger>
-							<DataTrigger Binding="{Binding Rate3, UpdateSourceTrigger=PropertyChanged}" Value="True">
+							<DataTrigger Binding="{Binding IsRate3, UpdateSourceTrigger=PropertyChanged}" Value="True">
 								<Setter Property="Background" Value="Yellow"/>
 							</DataTrigger>
-							<DataTrigger Binding="{Binding Rate4, UpdateSourceTrigger=PropertyChanged}" Value="True">
+							<DataTrigger Binding="{Binding IsRate4, UpdateSourceTrigger=PropertyChanged}" Value="True">
 								<Setter Property="Background" Value="Orange"/>
 							</DataTrigger>
-							<DataTrigger Binding="{Binding Rate5, UpdateSourceTrigger=PropertyChanged}" Value="True">
+							<DataTrigger Binding="{Binding IsRate5, UpdateSourceTrigger=PropertyChanged}" Value="True">
 								<Setter Property="Background" Value="Red"/>
 							</DataTrigger>
 						</Style.Triggers>

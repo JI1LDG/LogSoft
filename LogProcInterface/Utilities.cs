@@ -5,107 +5,191 @@ using LogProc.Definitions;
 
 namespace LogProc {
 	namespace Utilities {
-		public class SearchUtil {
-			public static bool CallsignHasStroke(string Callsign) {
-				if (Callsign[Callsign.Length - 2] == '/') return true;
+		public static class Callsign {
+			public static bool HasStroke(string callsign) {
+				if (callsign[callsign.Length - 2] == '/') return true;
 				else return false;
 			}
 
-			public static bool CnHasPower(string Cn) {
-				return Regex.IsMatch(Cn, @"(\d*)[^\d]");
+			public static string GetRemovedStroke(string callsign) {
+				if (callsign.IndexOf("/") != -1) {
+					callsign = callsign.Substring(0, callsign.IndexOf("/"));
+				}
+				return callsign;
 			}
 
-			public static string[] GetRSTVal(LogData Log) {
-				var chk = new List<string>();
-				int chars = 2;
-				if (Log.Mode == "CW") chars = 3;
-				chk.Add(Log.SendenContestNo.Substring(chars));
-				chk.Add(Log.ReceivenContestNo.Substring(chars));
-				return chk.ToArray();
-			}
-
-			public static bool FrequencyChk(string freq) {
-				if (defCTESTWIN.GetFreqNum(freq) == -1) {
-					return false;
-				} else return true;
-			}
-
-			public static bool IsJPCallSign(string CallSign) {
-				if(CallSign[0] == 'J') {
-					if('A' <= CallSign[1] && CallSign[1] <= 'S') return true;
-				} else if(CallSign[0] == '7' || CallSign[0] == '8') {
-					if('J' <= CallSign[1] && CallSign[1] <= 'N') return true;
+			public static bool IsJACallsign(string callsign) {
+				if (callsign[0] == 'J') {
+					if ('A' <= callsign[1] && callsign[1] <= 'S') return true;
+				} else if (callsign[0] == '7' || callsign[0] == '8') {
+					if ('J' <= callsign[1] && callsign[1] <= 'N') return true;
 				}
 
 				return false;
 			}
-			
-			public static void AnvstaChk(string Callsign, string AnvStation, List<ErrorReason> _er, StationData Station) {
-				if (Callsign[0] != '8') return;
-				string cs = defSearch.GetCallSignBesideStroke(Callsign);
-				if (!AnvStation.Contains(cs)) {
-					ErrorReason.SetError(_er, "CannotConfirmAnvsta");
-				}
-				if(Station == null && Callsign[0] != '8') {
-					ErrorReason.SetError(_er, "FailedToGetData");
-				}
-			}
 
-			public static int GetRegionFromCallSign(string CallSign, bool HasStroke) {
-				if (!HasStroke) {
+			public static string GetRegion(string callsign, bool hasStroke) {
+				if (!hasStroke) {
 					int region;
-					if(int.TryParse(CallSign.Substring(2, 1), out region) == false) {
-						return -1;
+					if (int.TryParse(callsign.Substring(2, 1), out region) == false) {
+						return "-1";
 					}
 
-					if(CallSign[0] == '7') {
-						if('K' <= CallSign[1] && CallSign[1] <= 'N') {
-							if('1' <= CallSign[2] && CallSign[2] <= '4') {
-								return 1;
+					if (callsign[0] == '7') {
+						if ('K' <= callsign[1] && callsign[1] <= 'N') {
+							if ('1' <= callsign[2] && callsign[2] <= '4') {
+								return "1";
 							}
 						}
 					}
-					return region;
+					return region.ToString();
 				}
-				return int.Parse(CallSign.Substring(CallSign.Length - 1));
+				return callsign.Substring(callsign.Length - 1);
+			}
+		}
+		public static class Contestno {
+			public static void CheckSentCn(LogData log, string contestno, string extraCn, bool hasPower, Dictionary<string, ErrorReason> listErr) {
+				string chk = Contestno.GetRstFilteredStr(log)["Sent"];
+				var cn = contestno;
+				var excn = extraCn;
+				if (excn != null) cn = excn;
+				if (chk != cn || Contestno.HasPower(log.SentCn) != hasPower) {
+					ErrorReason.Set(listErr, Reason.InvalidSentCn.ToString());
+				}
 			}
 
-			//59(9)####(*)
-			public static string GetPrefno(LogData Log, bool AcagMode = false) {
-				string res = GetAreano(Log);
-				if (AcagMode) {
-					return res.Substring(0, 2);//k7zoo america callsign
+			public static bool HasPower(string contestno) {
+				return Regex.IsMatch(contestno, @"(\d*)[^\d]");
+			}
+
+			public static Dictionary<string, string> GetRstFilteredStr(LogData log) {
+				var chk = new Dictionary<string, string>();
+				int chars = 2;
+				if (log.Mode == ModeStr.CW.ToString()) chars = 3;
+				chk.Add("Sent", log.SentCn.Substring(chars));
+				chk.Add("Received", log.ReceivedCn.Substring(chars));
+				return chk;
+			}
+
+			public static string GetAreano(LogData log) {
+				return GetAreano(GetRstFilteredStr(log)["Received"]);
+			}
+			public static string GetAreano(string rstFilteredStr) {
+				Match m = Regex.Match(rstFilteredStr, @"(\d*)\w*");
+				return m.Groups[1].Value;
+			}
+
+			public static string GetPrefno(LogData log, bool isAcagMode = false) {
+				return GetPrefno(GetAreano(log), isAcagMode);
+			}
+			public static string GetPrefno(string areano, bool isAcagMode = false) {
+				if (isAcagMode) {
+					return areano.Substring(0, 2);//k7zoo america callsign
 				} else {
-					return res;
+					return areano;
+				}
+			}
+			
+			public static string GetRegion(string prefno) {
+				int pn = int.Parse(prefno);
+				if (101 <= pn && pn <= 114) return "8";
+				if (pn == 1) return "8";
+				if (2 <= pn && pn <= 7) return "7";
+				if (pn == 8 || pn == 9) return "0";
+				if (10 <= pn && pn <= 17) return "1";
+				if (18 <= pn && pn <= 21) return "2";
+				if (22 <= pn && pn <= 27) return "3";
+				if (28 <= pn && pn <= 30) return "9";
+				if (31 <= pn && pn <= 35) return "4";
+				if (36 <= pn && pn <= 39) return "5";
+				if (40 <= pn && pn <= 47) return "6";
+				if (pn == 48) return "1";
+				return "-1";
+			}
+
+			public static Dictionary<CnStr, string> GetHoge(CnStr cnStr, LogData log, bool isAcagMode) {
+				var dicss = new Dictionary<CnStr, string>();
+
+				if (!cnStr.HasFlag(CnStr.RstFltred)) {
+					dicss.Add(CnStr.RstFltred, GetRstFilteredStr(log)["Received"]);
+					if (!cnStr.HasFlag(CnStr.Area)) {
+						dicss.Add(CnStr.Area, GetAreano(dicss[CnStr.RstFltred]));
+						if (!cnStr.HasFlag(CnStr.Pref)) {
+							dicss.Add(CnStr.Pref, GetPrefno(dicss[CnStr.Area], isAcagMode));
+							if (!cnStr.HasFlag(CnStr.Region)) {
+								dicss.Add(CnStr.Region, GetRegion(dicss[CnStr.Pref]));
+							}
+						}
+					}
+				}
+
+				return dicss;
+			}
+		}
+		public static class Freq {
+			public static string CnvTostr(this FreqStr freqStr) {
+				string[] s = new string[] { "1.9MHz", "3.5MHz", "7MHz", "10MHz", "14MHz", "18MHz", "21MHz", "24MHz", "28MHz", "50MHz", "144MHz", "430MHz", "1200MHz", "2400MHz", "5600MHz" };
+				return s[(int)freqStr];
+			}
+
+			public static int CnvTofrqnum(string freq) {
+				string[] s = new string[] { "1.9MHz", "3.5MHz", "7MHz", "10MHz", "14MHz", "18MHz", "21MHz", "24MHz", "28MHz", "50MHz", "144MHz", "430MHz", "1200MHz", "2400MHz", "5600MHz" };
+				int i = 0;
+				for (; i < s.Length; i++) {
+					if (s[i] == freq) break;
+				}
+				if (i == s.Length) return -1;
+				else return i;
+			}
+
+			public static bool IsBeen(string freq) {
+				if (Freq.CnvTofrqnum(freq) == -1) {
+					return false;
+				} else return true;
+			}
+		}
+		public static class Anv {
+			public static void Check(string callsign, string anvStr, Dictionary<string, ErrorReason> listError, StationData station) {
+				if (callsign[0] != '8') return;
+				string cs = Callsign.GetRemovedStroke(callsign);
+				if (!anvStr.Contains(cs)) {
+					ErrorReason.Set(listError, Reason.AnvUnchecked.ToString());
+				}
+				if(station == null && callsign[0] != '8') {
+					ErrorReason.Set(listError, Reason.GetDataFailed.ToString());
 				}
 			}
 
-			public static string GetAreano(LogData Log) {
-				Match m;
-				if (Log.Mode != "CW") m = Regex.Match(Log.ReceivenContestNo, @"(\d\d)(\d*)\w*");
-				else m = Regex.Match(Log.ReceivenContestNo, @"(\d\d\d)(\d*)\w*");
-				return m.Groups[2].Value;
+			public static string GetFromFile() {
+				System.IO.StreamReader sr;
+				try {
+					sr = new System.IO.StreamReader("data/8JStation.txt", System.Text.Encoding.Default);
+				} catch (System.IO.FileNotFoundException e) {
+					System.Console.WriteLine(e.Message);
+					return null;
+				}
+				string ret = sr.ReadToEnd();
+				sr.Close();
+				return ret;
 			}
 
-			public static int GetRegionFromCn(string Prefno) {
-				int prefno = int.Parse(Prefno);
-				if (101 <= prefno && prefno <= 114) return 8;
-				if (prefno == 1) return 8;
-				if (2 <= prefno && prefno <= 7) return 7;
-				if (prefno == 8 || prefno == 9) return 0;
-				if (10 <= prefno && prefno <= 17) return 1;
-				if (18 <= prefno && prefno <= 21) return 2;
-				if (22 <= prefno && prefno <= 27) return 3;
-				if (28 <= prefno && prefno <= 30) return 9;
-				if (31 <= prefno && prefno <= 35) return 4;
-				if (36 <= prefno && prefno <= 39) return 5;
-				if (40 <= prefno && prefno <= 47) return 6;
-				if (prefno == 48) return 1;
-				return -1;
-			}
+			public static string GetFromWeb() {
+				System.Net.WebClient wc = new System.Net.WebClient();
+				int nowyr = System.DateTime.Now.Year - 1;
+				string source = "8jsta";
+				try {
+					source = wc.DownloadString("http://www.motobayashi.net/8j-station/" + nowyr + ".html");
+					source += wc.DownloadString("http://www.motobayashi.net/8j-station/" + nowyr + 1 + ".html");
+				} catch (System.Net.WebException e) {
+					System.Console.WriteLine("GetError: " + e.Message);
+				}
 
-			public static bool AreanoExists(List<Area> AreaList, string areano) {
-				foreach(var a in AreaList) {
+				return source;
+			}
+		}
+		public static class Areano {
+			public static bool IsBeen(List<Area> listArea, string areano) {
+				foreach(var a in listArea) {
 					if(a.No == areano) {
 						return true;
 					}
@@ -113,65 +197,12 @@ namespace LogProc {
 				return false;
 			}
 
-			public static List<string> GetAreanoFromStation(StationData Station, List<Area> AreaData) {
-				var gsal = GetStationAddressList(Station);
-				if (gsal == null) return null;
-				var res = new List<string>();
-				foreach(var st in gsal) {
-					foreach(var ad in AreaData) {
-						foreach(var ar in ad.Address) {
-							if(st.Contains(ar) == true) {
-								res.Add(ad.No); //ato de chofuku jokyo
-							}
-						}
-					}
-				}
-				return res;
-			}
-
-			public static List<string> GetAreanoFromAddressList(List<string> AddressList, List<Area> AreaData) {
-				if (AddressList == null) return null;
-				var tmp = new List<string>();
-				foreach(var al in AddressList) {
-					foreach(var ad in AreaData) {
-						foreach(var a in ad.Address) {
-							if (al.Contains(a)) {
-								tmp.Add(al + "(" + ad.No + ")");
-							}
-						}
-					}
-				}
-				return tmp;
-			}
-
-			public static List<string> GetStationAddressList(StationData Station) {
-				if (Station == null) return null;
-				var tmp = new List<string>();
-				var spl = Station.Address.Split(new char[] { ',' });
-				return spl.ToList<string>();
-			}
-
-			public static bool AreanoMatches(string cnAreano, List<string> stationAreano) {
-				if (stationAreano == null) return false;
-				foreach(var sa in stationAreano) {
-					if(cnAreano == sa) {
-						return true;
-					}
-				}
-				return false;
-			}
-
-			public static string ConvToStrFromList(List<string> lstr) {
-				if (lstr == null) return "";
-				return string.Join(", ", lstr.ToArray());
-			}
-
-			public static List<Area> GetAreaListFromFile(string AreaFileName) {
-				System.IO.StreamReader sr = new System.IO.StreamReader("data/" + AreaFileName + ".area.txt", System.Text.Encoding.Default);
+			public static List<Area> GetList(string areaFileName) {
+				System.IO.StreamReader sr = new System.IO.StreamReader("data/" + areaFileName + ".area.txt", System.Text.Encoding.Default);
 				var AreaData = new List<Area>();
-				while(sr.Peek() > 0) {
+				while (sr.Peek() > 0) {
 					string buf = sr.ReadLine();
-					switch(buf[0]) {
+					switch (buf[0]) {
 						case 'A':
 							var m = Regex.Match(buf, @"A (\d*) (\w*)");
 							AreaData.Add(new Area() { No = m.Groups[1].Value, Address = new List<string>() { m.Groups[2].Value } });
@@ -180,7 +211,7 @@ namespace LogProc {
 							var mc = Regex.Matches(buf, @"E (\d*) (\w*)\(\w*\) (\w*)(, (\w*)){0,}");
 							List<string> ls = new List<string>();
 							ls.Add(mc[0].Groups[2].Captures[0].Value + mc[0].Groups[3].Captures[0].Value);
-							foreach(var tn in mc[0].Groups[5].Captures) {
+							foreach (var tn in mc[0].Groups[5].Captures) {
 								ls.Add(mc[0].Groups[2].Captures[0].Value + (tn as Capture).Value);
 							}
 							AreaData.Add(new Area() { No = mc[0].Groups[1].Value, Address = ls });
@@ -189,7 +220,7 @@ namespace LogProc {
 							var mci = Regex.Matches(buf, @"I (\d*) (\w*)\(\w*\) (\w*)(, (\w*)){0,}");
 							List<string> lsi = new List<string>();
 							lsi.Add(mci[0].Groups[2].Captures[0].Value + mci[0].Groups[3].Captures[0].Value);
-							foreach(var tn in mci[0].Groups[5].Captures) {
+							foreach (var tn in mci[0].Groups[5].Captures) {
 								lsi.Add(mci[0].Groups[2].Captures[0].Value + (tn as Capture).Value);
 							}
 							AreaData.Add(new Area() { No = mci[0].Groups[1].Value, Address = lsi });
@@ -198,7 +229,7 @@ namespace LogProc {
 							var mcn = Regex.Matches(buf, @"N (\d*) (\w*) (\w*)(, (\w*)){0,}");
 							List<string> lsn = new List<string>();
 							lsn.Add(mcn[0].Groups[3].Captures[0].Value);
-							foreach(var ti in mcn[0].Groups[5].Captures) {
+							foreach (var ti in mcn[0].Groups[5].Captures) {
 								lsn.Add((ti as Capture).Value);
 							}
 							AreaData.Add(new Area() { No = mcn[0].Groups[1].Value, Address = lsn });
@@ -210,39 +241,67 @@ namespace LogProc {
 				return AreaData;
 			}
 
-			public static string Get8JStationDataFromFile() {
-				System.IO.StreamReader sr;
-				try {
-					sr = new System.IO.StreamReader("data/8JStation.txt", System.Text.Encoding.Default);
-				}catch(System.IO.FileNotFoundException e) {
-					System.Console.WriteLine(e.Message);
-					return null;
+			public static List<string> GetFromList(List<string> listAddress, List<Area> listArea) {
+				if (listAddress == null) return null;
+				var tmp = new List<string>();
+				foreach (var al in listAddress) {
+					foreach (var ad in listArea) {
+						foreach (var a in ad.Address) {
+							if (al.Contains(a)) {
+								tmp.Add(al + "(" + ad.No + ")");
+							}
+						}
+					}
 				}
-				string ret = sr.ReadToEnd();
-				sr.Close();
-				return ret;
+				return tmp;
 			}
 
-			public static string Get8JStationDataFromWeb() {
-				System.Net.WebClient wc = new System.Net.WebClient();
-				int nowyr = System.DateTime.Now.Year - 1;
-				string source = "8jsta";
-				try {
-					source = wc.DownloadString("http://www.motobayashi.net/8j-station/" + nowyr + ".html");
-					source += wc.DownloadString("http://www.motobayashi.net/8j-station/" + nowyr + 1 + ".html");
-				} catch(System.Net.WebException e) {
-					System.Console.WriteLine("GetError: " + e.Message);
+			public static List<string> GetFromStation(StationData station, List<Area> listArea) {
+				var gsal = Station.GetList(station);
+				if (gsal == null) return null;
+				var res = new List<string>();
+				foreach(var st in gsal) {
+					foreach(var ad in listArea) {
+						foreach(var ar in ad.Address) {
+							if(st.Contains(ar) == true) {
+								res.Add(ad.No); //ato de chofuku jokyo
+							}
+						}
+					}
 				}
-
-				return source;
+				return res;
+			}
+		}
+		public static class Station {
+			public static List<string> GetList(StationData station) {
+				if (station == null) return null;
+				var tmp = new List<string>();
+				var spl = station.Address.Split(new char[] { ',' });
+				return spl.ToList<string>();
 			}
 
-			public static string GetOpList(WorkingData Work) {
-				if(!Work.Config.AutoOperatorEdit) {
-					return Work.Config.Operator;
+			public static bool IsMatched(string areano, List<string> listAreano) {
+				if (listAreano == null) return false;
+				foreach (var sa in listAreano) {
+					if (areano == sa) {
+						return true;
+					}
+				}
+				return false;
+			}
+		}
+		public static class Utils {
+			public static string ConvTostrarrFromList(List<string> listStr) {
+				if (listStr == null) return "";
+				return string.Join(", ", listStr.ToArray());
+			}			
+
+			public static string GetOpList(WorkingData workData) {
+				if(!workData.Config.IsAutoOperatorEditEnabled) {
+					return workData.Config.Operator;
 				}
 				List<string> op = new List<string>();
-				foreach(var l in Work.Log) {
+				foreach(var l in workData.Log) {
 					bool avail = false;
 					foreach(var o in op) {
 						if(o == l.Operator) {

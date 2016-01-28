@@ -35,26 +35,26 @@ namespace LogProc {
 			ExecStatus = false;
 			Abort = false;
 
-			string anv = SearchUtil.Get8JStationDataFromFile();
-			if(anv == null) anv = SearchUtil.Get8JStationDataFromWeb();
+			string anv = Anv.GetFromFile();
+			if(anv == null) anv = Anv.GetFromWeb();
 
 			foreach(LogData ld in Log) {
 				if(Abort) break;
-				ld.Searchen = true;
-				ld.Finden = true;
+				ld.IsSearched = true;
+				ld.IsFinded = true;
 				ld.FailedStr = "";
-				SearchFunc = new SearchData(ld.CallSign);
+				SearchFunc = new SearchData(ld.Callsign);
 				if(SearchFunc.Station == null) {
 					FailedNum++;
-					ld.Finden = false;
+					ld.IsFinded = false;
 				} else Station.Add(SearchFunc.Station);
 
-				Plugins.Log = ld;
-				Plugins.Station = SearchFunc.Station;
-				Plugins.AnvStation = anv;
-				Plugins.Config = Config;
+				Plugins.log = ld;
+				Plugins.station = SearchFunc.Station;
+				Plugins.anvStr = anv;
+				Plugins.config = Config;
 
-				Plugins.DoCheck();
+				Plugins.check();
 				if(Plugins.isErrorAvailable) FCheckNum++;
 				ExecutedNum++;
 			}
@@ -120,7 +120,7 @@ namespace LogProc {
 			public string Condition { get; private set; }
 
 			public SearchData(string CallSign) {
-				callsign = defSearch.GetCallSignBesideStroke(CallSign);
+				callsign = Callsign.GetRemovedStroke(CallSign);
 
 				Condition = "GetFromDB";
 				Station = SearchDetailFromDB();
@@ -167,7 +167,7 @@ namespace LogProc {
 				@"(?<url>[^\s>]+))[^>]*>(?<text>.*?)</a>");
 				sd.Url = ml.Groups["url"].Value;
 				sd.Url = "http://www.tele.soumu.go.jp/musen/" + sd.Url.Substring(2);
-				sd.CallSign = callsign;
+				sd.Callsign = callsign;
 				sd.Name = mt[0].Groups[1].Value;
 				return sd;
 			}
@@ -205,7 +205,7 @@ namespace LogProc {
 								return null;
 							}
 							reader.Read();
-							sd.CallSign = reader["callsign"].ToString();
+							sd.Callsign = reader["callsign"].ToString();
 							sd.Address = reader["address"].ToString();
 							sd.Name = reader["name"].ToString();
 						}
@@ -221,7 +221,7 @@ namespace LogProc {
 					connect.Open();
 					using(SQLiteTransaction sqlt = connect.BeginTransaction()) {
 						using(SQLiteCommand command = connect.CreateCommand()) {
-							command.CommandText = "insert into Stations (callsign, name, address) values('" + defSearch.GetCallSignBesideStroke(sd.CallSign) + "', '" + sd.Name + "', '" + sd.Address + "')";
+							command.CommandText = "insert into Stations (callsign, name, address) values('" + Callsign.GetRemovedStroke(sd.Callsign) + "', '" + sd.Name + "', '" + sd.Address + "')";
 							command.ExecuteNonQuery();
 						}
 						sqlt.Commit();

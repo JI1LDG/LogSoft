@@ -1,19 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Text.RegularExpressions;
 using System.Collections.ObjectModel;
 using LogProc.Definitions;
+using LogProc.Utilities;
 
 namespace LogProc {
 	public partial class ContestNo : Window {
@@ -25,11 +17,11 @@ namespace LogProc {
 			scn = new ObservableCollection<ScnData>();
 			var match = Regex.Matches(extra, @"([\w\d\.]+), ([^:,]+): ");
 			foreach (Match m in match) {
-				scn.Add(new ScnData() { Frequency = m.Groups[1].Value, Scn = m.Groups[2].Value });
+				scn.Add(new ScnData() { Freq = m.Groups[1].Value, SentCn = m.Groups[2].Value });
 			}
 			dgRcn.ItemsSource = scn;
-			foreach(defCTESTWIN.FreqStr fs in Enum.GetValues(typeof(defCTESTWIN.FreqStr))) {
-				cbFreq.Items.Add(defCTESTWIN.GetFreqString(fs));
+			foreach(FreqStr fs in Enum.GetValues(typeof(FreqStr))) {
+				cbFreq.Items.Add(Freq.CnvTostr(fs));
 			}
 		}
 
@@ -37,7 +29,7 @@ namespace LogProc {
 			var scn = new ObservableCollection<ScnData>();
 			var match = Regex.Matches(ex, @"([\w\d\.]+), ([^:,]+): ");
 			foreach (Match m in match) {
-				scn.Add(new ScnData() { Frequency = m.Groups[1].Value, Scn = m.Groups[2].Value });
+				scn.Add(new ScnData() { Freq = m.Groups[1].Value, SentCn = m.Groups[2].Value });
 			}
 			return scn.ToList<ScnData>();
 		}
@@ -45,8 +37,8 @@ namespace LogProc {
 		public static string GetVal(string ex, string freq) {
 			var list = GetScnList(ex);
 			foreach(var l in list) {
-				if(l.Frequency == freq) {
-					return l.Scn;
+				if(l.Freq == freq) {
+					return l.SentCn;
 				}
 			}
 			return null;
@@ -59,14 +51,14 @@ namespace LogProc {
 		private void btConfirm_Click(object sender, RoutedEventArgs e) {
 			string tmp = "";
 			foreach(var s in scn) {
-				tmp += s.Frequency + ", " + s.Scn + ": ";
+				tmp += s.Freq + ", " + s.SentCn + ": ";
 			}
 			retEx = tmp;
 			this.Close();
 		}
 
 		private void btAdd_Click(object sender, RoutedEventArgs e) {
-			scn.Add(new ScnData() { Frequency = cbFreq.Text, Scn = tbScn.Text, });
+			scn.Add(new ScnData() { Freq = cbFreq.Text, SentCn = tbScn.Text, });
 			scn = new ObservableCollection<ScnData>(scn);
 			dgRcn.ItemsSource = scn;
 		}

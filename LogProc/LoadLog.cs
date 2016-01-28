@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Microsoft.Win32;
 using System.Windows;
 using LogProc.Definitions;
+using LogProc.Utilities;
 
 namespace LogProc {
 	class LoadLog {
@@ -82,21 +83,21 @@ namespace LogProc {
 				bs.GETCHAR(6);
 				bs.GETCHAR(8);
 				for(ushort i = 0;i < logNum;i++) {
-					string call = bs.GETCHAR(defCTESTWIN.CallLen);
-					string mycno = bs.GETCHAR(defCTESTWIN.NumLen);
-					string opcno = bs.GETCHAR(defCTESTWIN.NumLen);
-					string mode = ((defCTESTWIN.ModeStr)bs.GETUSHORT()).ToString();
-					string freq = defCTESTWIN.GetFreqString((defCTESTWIN.FreqStr)bs.GETUSHORT());
+					string call = bs.GETCHAR(CtestwinDefs.CallLen);
+					string mycno = bs.GETCHAR(CtestwinDefs.NumLen);
+					string opcno = bs.GETCHAR(CtestwinDefs.NumLen);
+					string mode = ((ModeStr)bs.GETUSHORT()).ToString();
+					string freq = Freq.CnvTostr((FreqStr)bs.GETUSHORT());
 					bs.GETUSHORT();
 					bs.GETUSHORT();
 					DateTime date = CTimeToDate(bs.GETLONG());
-					string oprtr = bs.GETCHAR(defCTESTWIN.CallLen);
+					string oprtr = bs.GETCHAR(CtestwinDefs.CallLen);
 					bs.GETUSHORT();
-					string rem = bs.GETCHAR(defCTESTWIN.RemLen + 2);
+					string rem = bs.GETCHAR(CtestwinDefs.RemLen + 2);
 					tmp.Add(new LogData {
-						Date = date, CallSign = call, SendenContestNo = mycno, ReceivenContestNo = opcno,
-						Mode = mode, Frequency = freq, Operator = oprtr, Rem = rem, Point = 1,
-						Searchen = false, Finden = true,
+						Date = date, Callsign = call, SentCn = mycno, ReceivedCn = opcno,
+						Mode = mode, Freq = freq, Operator = oprtr, Rem = rem, Point = 1,
+						IsSearched = false, IsFinded = true,
 					});
 				}
 			} catch(Exception e) {
@@ -157,11 +158,11 @@ namespace LogProc {
 							}
 						}
 						loglist.Add(new LogData() {
-							Date = dt, CallSign = callsign, SendenContestNo = scn,
-							ReceivenContestNo = rcn, Frequency = freq + "MHz",
+							Date = dt, Callsign = callsign, SentCn = scn,
+							ReceivedCn = rcn, Freq = freq + "MHz",
 							Mode = mode, Operator = ope,
 							Point = pts,
-							Rem = rem, Finden = false, Searchen = false,
+							Rem = rem, IsFinded = false, IsSearched = false,
 						});
 					}
 				}

@@ -39,10 +39,10 @@ namespace LogProc {
 			Multi = new List<Multiply>();
 			Work = wd;
 			if (Plugins != null) {
-				Plugins.Config = Work.Config;
-				Plugins.AreaMax = areaMax;
-				Plugins.FreqNum = freqNum;
-				Plugins.Multi = Multi;
+				Plugins.config = Work.Config;
+				Plugins.areaMax = areaMax;
+				Plugins.freqNum = freqNum;
+				Plugins.listMulti = Multi;
 			}
 		}
 
@@ -59,20 +59,20 @@ namespace LogProc {
 			Summery += "<CONTESTNAME>" + Work.Config.ContestName + "</CONTESTNAME>\r\n";
 			Summery += "<CATEGORYCODE>" + Work.Config.CategoryCode + "</CATEGORYCODE>\r\n";
 			Summery += "<CATEGORYNAME>" + Work.Config.CategoryName + "</CATEGORYNAME>\r\n";
-			Summery += "<CALLSIGN>" + Work.Config.CallSign + "</CALLSIGN>\r\n";
-			Summery += Plugins.isEditenScore ? Plugins.GetScoreStr() : GetScoreStr();
+			Summery += "<CALLSIGN>" + Work.Config.Callsign + "</CALLSIGN>\r\n";
+			Summery += Plugins.isScoreEdited ? Plugins.getScoreStr() : GetScoreStr();
 			Summery += "<ADDRESS>〒" + Work.Config.ZipCode + " " + Work.Config.Address + "</ADDRESS>\r\n";
 			Summery += "<TEL>" + Work.Config.Phone + "</TEL>\r\n";
 			Summery += "<NAME>" + Work.Config.Name + "</NAME>\r\n";
 			Summery += "<EMAIL>" + Work.Config.Mail + "</EMAIL>\r\n";
 			Summery += "<LICENSECLASS>" + Work.Config.LicenserLicense + "</LICENSECLASS>\r\n";
-			Summery += "<POWER>" + Work.Config.PowerValue + "</POWER>\r\n";
+			Summery += "<POWER>" + Work.Config.PowerVal + "</POWER>\r\n";
 			Summery += "<POWERTYPE>" + Work.Config.PowerType + "</POWERTYPE>\r\n";
 			if (Work.Config.Place != "") Summery += "<OPPLACE>" + Work.Config.Place + "</OPPLACE>\r\n";
 			if (Work.Config.Supply != "") Summery += "<POWERSUPPLY>" + Work.Config.Supply + "</POWERSUPPLY>\r\n";
-			Summery += "<EQUIPMENT>" + Work.Config.Equipment + "</EQUIPMENT>\r\n";
+			Summery += "<EQUIPMENT>" + Work.Config.Equip + "</EQUIPMENT>\r\n";
 			Summery += "<COMMENTS>" + Work.Config.Comment + "</COMMENTS>\r\n";
-			Summery += "<MULTIOPLIST>" + SearchUtil.GetOpList(Work) + "</MULTIOPLIST>\r\n";
+			Summery += "<MULTIOPLIST>" + Utils.GetOpList(Work) + "</MULTIOPLIST>\r\n";
 			Summery += "<OATH>" + Work.Config.Oath + "</OATH>\r\n";
 			Summery += "<DATE>" + DateTime.Today.ToLongDateString() + "</DATE>\r\n";
 			Summery += "<SIGNATURE>" + Work.Config.LicenserName + "</SIGNATURE>\r\n";
@@ -87,11 +87,11 @@ namespace LogProc {
 				if (l.Point == 0) continue;
 				bool mul = false;
 				bool found = false;
-				string areano = Plugins.GetContestAreaNoFromRcn(l);
-				int freq = defCTESTWIN.GetFreqNum(l.Frequency);
+				string areano = Plugins.getAreano(l);
+				int freq = Freq.CnvTofrqnum(l.Freq);
 				if (areano == "" || freq == -1) continue;
 				foreach (var m in Multi) {
-					if (m.Frequency == freq && m.AreaNo == areano) {
+					if (m.Freq == freq && m.Areano == areano) {
 						m.Num++;
 						m.Point += l.Point;
 						found = true;
@@ -100,16 +100,16 @@ namespace LogProc {
 				}
 				if (!found) {
 					Multi.Add(new Multiply() {
-						Frequency = freq, AreaNo = areano, Num = 1, Point = l.Point,
+						Freq = freq, Areano = areano, Num = 1, Point = l.Point,
 					});
 					mul = true;
 				}
 				opLog += l.Date.Month.ToString().PadRight(4) + l.Date.Day.ToString().PadRight(4) + l.Date.ToString("HHmm ");
 
-				opLog += l.CallSign.PadRight(15 + 1) + l.SendenContestNo.PadRight(10 + 1) + l.ReceivenContestNo.PadRight(10 + 1);
+				opLog += l.Callsign.PadRight(15 + 1) + l.SentCn.PadRight(10 + 1) + l.ReceivedCn.PadRight(10 + 1);
 				if (mul) opLog += areano.ToString().PadRight(6 + 1);
 				else opLog += "".PadRight(6 + 1);
-				opLog += DivFreqNum(l.Frequency).PadRight(5) + l.Mode.PadRight(5);
+				opLog += DivFreqNum(l.Freq).PadRight(5) + l.Mode.PadRight(5);
 				opLog += l.Point.ToString().PadRight(4);
 				if (sheetType == false) {
 					opLog += "%%" + l.Operator + "%%" + "\r\n";
@@ -130,13 +130,13 @@ namespace LogProc {
 				int logNum = 0;
 				int ptsNum = 0;
 				foreach (var m in Multi) {
-					if (m.Frequency != i) continue;
+					if (m.Freq != i) continue;
 					multiNum++;
 					logNum += m.Num;
 					ptsNum += m.Point;
 				}
 				if (multiNum == 0) continue;
-				output += "<SCORE BAND=" + defCTESTWIN.GetFreqString((defCTESTWIN.FreqStr)i) + ">";
+				output += "<SCORE BAND=" + Freq.CnvTostr((FreqStr)i) + ">";
 				output += logNum + "," + ptsNum + "," + multiNum + "</SCORE>\r\n";
 				totalLog += logNum;
 				totalPts += ptsNum;

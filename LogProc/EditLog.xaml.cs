@@ -36,16 +36,16 @@ namespace LogProc {
 				if(tbSendenCN.Text != null && tbSendenCN.Text != "") {
 					switch (cbLogSlcter.Text) {
 						case "コールサイン":
-							l.CallSign = tbSendenCN.Text;
+							l.Callsign = tbSendenCN.Text;
 							break;
 						case "自局CN":
-							l.SendenContestNo = tbSendenCN.Text;
+							l.SentCn = tbSendenCN.Text;
 							break;
 						case "相手CN":
-							l.ReceivenContestNo = tbSendenCN.Text;
+							l.ReceivedCn = tbSendenCN.Text;
 							break;
 						case "周波数":
-							l.Frequency = tbSendenCN.Text + "MHz";
+							l.Freq = tbSendenCN.Text + "MHz";
 							break;
 						case "モード":
 							l.Mode = tbSendenCN.Text;
