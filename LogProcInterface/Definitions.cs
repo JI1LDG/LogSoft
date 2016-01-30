@@ -7,6 +7,10 @@ using System.Text.RegularExpressions;
 
 namespace LogProc {
 	namespace Definitions {
+		public static class defs {
+			public const string SettingVer = "0.8.50";
+		}
+
 		public enum ModeStr {
 			CW, RTTY, SSB, FM, AM,
 		}
@@ -144,6 +148,38 @@ namespace LogProc {
 			public string Equip { get; set; }
 			public string Comment { get; set; }
 			public string Oath { get; set; }
+		}
+
+		namespace v0810 {
+			public class Setting {
+				public string Version { get; set; }
+				public string ContestName { get; set; }
+				public string CategoryCode { get; set; }
+				public string CategoryName { get; set; }
+				public string CategoryPower { get; set; }
+				public bool Coefficient { get; set; }
+				public string ContestNo { get; set; }
+				public string SubContestNo { get; set; }
+				public string ScnExtra { get; set; }
+				public bool IsSubCN { get; set; }
+				public string PowerType { get; set; }
+				public string PowerValue { get; set; }
+				public bool AutoOperatorEdit { get; set; }
+				public string Operator { get; set; }
+				public string CallSign { get; set; }
+				public string ZipCode { get; set; }
+				public string Address { get; set; }
+				public string Phone { get; set; }
+				public string Name { get; set; }
+				public string Mail { get; set; }
+				public string LicenserName { get; set; }
+				public string LicenserLicense { get; set; }
+				public string Place { get; set; }
+				public string Supply { get; set; }
+				public string Equipment { get; set; }
+				public string Comment { get; set; }
+				public string Oath { get; set; }
+			}
 		}
 
 		public class CategoryData {
