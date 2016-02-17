@@ -7,8 +7,23 @@ using System.Text.RegularExpressions;
 
 namespace LogProc {
 	namespace Definitions {
-		public static class defs {
+		public class defs {
 			public const string SettingVer = "0.8.50";
+			public static string[][] PrefList() {
+				string[][] tmp = new string[][] {
+				new string[] {"長野", "新潟"},
+				new string[] {"東京", "神奈川", "千葉", "埼玉", "群馬", "栃木", "茨城", "山梨"},
+				new string[] {"愛知", "静岡", "岐阜", "三重"},
+				new string[] {"大阪", "兵庫", "京都", "奈良", "滋賀", "和歌山"},
+				new string[] {"岡山", "広島", "山口", "鳥取", "島根"},
+				new string[] {"香川", "愛媛", "高知", "徳島"},
+				new string[] {"福岡", "佐賀", "長崎", "熊本", "大分", "宮崎", "鹿児島", "沖縄"},
+				new string[] {"宮城", "福島", "岩手", "青森", "秋田", "山形"},
+				new string[] {"北海道"},
+				new string[] {"石川", "福井", "富山"}
+				};
+			return tmp;
+				}
 		}
 
 		public enum ModeStr {

@@ -107,6 +107,31 @@ namespace LogProc {
 				return "-1";
 			}
 
+			public static List<string> GetPhoneRegion(string areano, List<Area> listArea) {
+				var tmp = new int[10];
+				foreach(var la in listArea) {
+					if(la.No == areano) {
+						foreach(var ladd in la.Address) {
+							for(int i = 0;i < 10; i++) {
+								if (tmp[i] > 0) continue;
+								foreach(var p in defs.PrefList()[i]) {
+									if (ladd.Contains(p)) {
+										tmp[i]++;
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+				var ret = new List<string>();
+				for(int j = 0;j < 10; j++) {
+					if (tmp[j] > 0) ret.Add(j.ToString());
+				}
+				if (ret.Count > 0) return ret;
+				return null;
+			}
+
 			public static Dictionary<CnStr, string> GetHoge(CnStr cnStr, LogData log, bool isAcagMode) {
 				var dicss = new Dictionary<CnStr, string>();
 
@@ -293,7 +318,7 @@ namespace LogProc {
 		public static class Utils {
 			public static string ConvTostrarrFromList(List<string> listStr) {
 				if (listStr == null) return "";
-				return string.Join(", ", listStr.ToArray());
+				return string.Join(", ", listStr.Distinct<string>().ToArray());
 			}			
 
 			public static string GetOpList(WorkingData workData) {

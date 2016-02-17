@@ -72,6 +72,7 @@
 					<DataGridTextColumn Header="オペレータ" Binding="{Binding Operator}"/>
 					<DataGridTextColumn Header="コメント" Binding="{Binding Rem}"/>
 					<DataGridTextColumn Header="エラー詳細" Binding="{Binding FailedStr}" IsReadOnly="True"/>
+					<DataGridTextColumn Header="得点" Binding="{Binding Point}" IsReadOnly="True"/>
 				</DataGrid.Columns>
 				<DataGrid.ItemContainerStyle>
 					<Style TargetType="DataGridRow">
