@@ -209,6 +209,10 @@ namespace LogProc {
 					System.Console.WriteLine("GetError: " + e.Message);
 				}
 
+				System.IO.StreamWriter sw = new System.IO.StreamWriter(@"data/8JStation.txt", false, System.Text.Encoding.Default);
+				sw.Write(source);
+				sw.Close();
+
 				return source;
 			}
 		}
