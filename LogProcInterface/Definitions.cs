@@ -161,6 +161,7 @@ namespace LogProc {
 			public string Place { get; set; }
 			public string Supply { get; set; }
 			public string Equip { get; set; }
+			public string UseType { get; set; }
 			public string Comment { get; set; }
 			public string Oath { get; set; }
 		}

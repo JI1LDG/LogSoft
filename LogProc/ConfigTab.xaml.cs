@@ -13,11 +13,9 @@ namespace LogProc {
 		private string extra;
 
 		private IDefine[] _plg;
-		public IDefine[] Plugins
-		{
+		public IDefine[] Plugins {
 			private get { return _plg; }
-			set
-			{
+			set {
 				_plg = value;
 				cbContestName.Items.Clear();
 				foreach (var dp in _plg) {
@@ -87,253 +85,255 @@ namespace LogProc {
 			return DoSave();
 		}
 
-	public Setting GetSetting() {
-		Setting config;
+		public Setting GetSetting() {
+			Setting config;
 
-		config = DoSave();
+			config = DoSave();
 
-		return config;
-	}
-
-	public Setting SaveSetting() {
-		Setting config;
-
-		config = DoSave();
-		SaveFileDialog sfd = new SaveFileDialog();
-		sfd.Title = "設定ファイルの保存";
-		sfd.Filter = "設定ファイル(*.set.xml)|*.set.xml";
-		if (sfd.ShowDialog() == true) {
-			string filename = sfd.FileName;
-			System.Xml.Serialization.XmlSerializer serial = new System.Xml.Serialization.XmlSerializer(typeof(Setting));
-			var sw = new System.IO.StreamWriter(filename, false, new System.Text.UTF8Encoding(false));
-			serial.Serialize(sw, config);
-			sw.Close();
+			return config;
 		}
 
-		return config;
-	}
+		public Setting SaveSetting() {
+			Setting config;
+
+			config = DoSave();
+			SaveFileDialog sfd = new SaveFileDialog();
+			sfd.Title = "設定ファイルの保存";
+			sfd.Filter = "設定ファイル(*.set.xml)|*.set.xml";
+			if (sfd.ShowDialog() == true) {
+				string filename = sfd.FileName;
+				System.Xml.Serialization.XmlSerializer serial = new System.Xml.Serialization.XmlSerializer(typeof(Setting));
+				var sw = new System.IO.StreamWriter(filename, false, new System.Text.UTF8Encoding(false));
+				serial.Serialize(sw, config);
+				sw.Close();
+			}
+
+			return config;
+		}
 
 
 
-	public void DoLoad(Setting st) {
-		foreach (var dp in Plugins) {
-			if (dp.contestName != st.ContestName) continue;
-			cbContestName.Text = st.ContestName;
-			FillCategory(st.ContestName);
-			foreach (var cc in dp.contestCategories) {
-				if (cc.Name != st.CategoryName) continue;
-				cbCategory.Text = "(" + dp.GetCodeDivPower(st.CategoryCode, GetContestPowerEnumFromStr(st.CategoryPower)) + ")" + st.CategoryName;
-				ChangeEnablalContestPower(dp.GetPowerAllowed(cc.Code));
-				CheckCategoryPowerByConvertenStr(st.CategoryPower);
+		public void DoLoad(Setting st) {
+			foreach (var dp in Plugins) {
+				if (dp.contestName != st.ContestName) continue;
+				cbContestName.Text = st.ContestName;
+				FillCategory(st.ContestName);
+				foreach (var cc in dp.contestCategories) {
+					if (cc.Name != st.CategoryName) continue;
+					cbCategory.Text = "(" + dp.GetCodeDivPower(st.CategoryCode, GetContestPowerEnumFromStr(st.CategoryPower)) + ")" + st.CategoryName;
+					ChangeEnablalContestPower(dp.GetPowerAllowed(cc.Code));
+					CheckCategoryPowerByConvertenStr(st.CategoryPower);
+					break;
+				}
+				if (dp.isCoefficientEnabled) {
+					cbCoefficient.IsEnabled = true;
+					cbCoefficient.IsChecked = st.IsCoefficientEnabled;
+				} else {
+					cbCoefficient.IsEnabled = false;
+					cbCoefficient.IsChecked = false;
+				}
+				if (dp.isSubCnEnabled) {
+					tbSubContestNo.IsEnabled = true;
+					tbSubContestNo.Text = st.SubContestno;
+				} else {
+					tbSubContestNo.IsEnabled = false;
+				}
 				break;
 			}
-			if (dp.isCoefficientEnabled) {
-				cbCoefficient.IsEnabled = true;
-				cbCoefficient.IsChecked = st.IsCoefficientEnabled;
-			} else {
-				cbCoefficient.IsEnabled = false;
-				cbCoefficient.IsChecked = false;
-			}
-			if (dp.isSubCnEnabled) {
-				tbSubContestNo.IsEnabled = true;
-				tbSubContestNo.Text = st.SubContestno;
-			} else {
-				tbSubContestNo.IsEnabled = false;
-			}
-			break;
+			extra = (st.SentCnExtra == null) ? "" : st.SentCnExtra;
+			tbMainContestNo.Text = st.Contestno;
+			tbSubContestNo.Text = st.SubContestno;
+			rbNormal.IsChecked = st.PowerType == "定格出力" ? true : false;
+			rbReal.IsChecked = rbNormal.IsChecked == true ? false : true;
+			cbPowerValue.Text = st.PowerVal;
+			cbAutoOperator.IsChecked = st.IsAutoOperatorEditEnabled;
+			tbOperator.Text = st.Operator;
+			tbCallSign.Text = st.Callsign;
+			tbZipCode.Text = st.ZipCode;
+			tbAddress.Text = st.Address;
+			tbPhone.Text = st.Phone;
+			tbName.Text = st.Name;
+			tbMail.Text = st.Mail;
+			tbLicenserName.Text = st.LicenserName;
+			cbLincenserLicense.Text = st.LicenserLicense;
+			tbPlace.Text = st.Place;
+			tbSupply.Text = st.Supply;
+			tbEquip.Text = st.Equip;
+			tbUseType.Text = st.UseType;
+			tbComment.Text = st.Comment;
+			tbOath.Text = st.Oath;
 		}
-		extra = (st.SentCnExtra == null) ? "" : st.SentCnExtra;
-		tbMainContestNo.Text = st.Contestno;
-		tbSubContestNo.Text = st.SubContestno;
-		rbNormal.IsChecked = st.PowerType == "定格出力" ? true : false;
-		rbReal.IsChecked = rbNormal.IsChecked == true ? false : true;
-		cbPowerValue.Text = st.PowerVal;
-		cbAutoOperator.IsChecked = st.IsAutoOperatorEditEnabled;
-		tbOperator.Text = st.Operator;
-		tbCallSign.Text = st.Callsign;
-		tbZipCode.Text = st.ZipCode;
-		tbAddress.Text = st.Address;
-		tbPhone.Text = st.Phone;
-		tbName.Text = st.Name;
-		tbMail.Text = st.Mail;
-		tbLicenserName.Text = st.LicenserName;
-		cbLincenserLicense.Text = st.LicenserLicense;
-		tbPlace.Text = st.Place;
-		tbSupply.Text = st.Supply;
-		tbEquip.Text = st.Equip;
-		tbComment.Text = st.Comment;
-		tbOath.Text = st.Oath;
-	}
 
-	private Setting DoSave() {
-		Setting st = new Setting();
-		st.Version = defs.SettingVer;
+		private Setting DoSave() {
+			Setting st = new Setting();
+			st.Version = defs.SettingVer;
 
-		st.ContestName = cbContestName.Text;
-		foreach (var dp in Plugins) {
-			if (dp.contestName != st.ContestName) continue;
-			st.CategoryCode = dp.GetCodeWithPower(cbCategory.Text.Substring(1, cbCategory.Text.IndexOf(")") - 1), ConvertCategoryPowerToEnum());
-			st.IsSubCnEnabled = dp.isSubCnEnabled;
-			break;
-		}
-		st.CategoryName = cbCategory.Text.Substring(cbCategory.Text.IndexOf(")") + 1);
-		st.CategoryPower = ConvertCategoryPowerToStr();
-		st.IsCoefficientEnabled = cbCoefficient.IsChecked == true ? true : false;
-		st.Contestno = tbMainContestNo.Text;
-		st.SubContestno = tbSubContestNo.Text;
-		st.SentCnExtra = extra;
-		st.PowerType = rbNormal.IsChecked == true ? "定格出力" : "実測出力";
-		st.PowerVal = cbPowerValue.Text;
-		st.IsAutoOperatorEditEnabled = cbAutoOperator.IsChecked == true ? true : false;
-		if (!st.IsAutoOperatorEditEnabled) {
-			st.Operator = tbOperator.Text;
-		}
-		st.Callsign = tbCallSign.Text;
-		st.ZipCode = tbZipCode.Text;
-		st.Address = tbAddress.Text;
-		st.Phone = tbPhone.Text;
-		st.Name = tbName.Text;
-		st.Mail = tbMail.Text;
-		st.LicenserName = tbLicenserName.Text;
-		st.LicenserLicense = cbLincenserLicense.Text;
-		st.Place = tbPlace.Text;
-		st.Supply = tbSupply.Text;
-		st.Equip = tbEquip.Text;
-		st.Comment = tbComment.Text;
-		st.Oath = tbOath.Text;
-
-		return st;
-	}
-
-	private string ConvertCategoryPowerToStr() {
-		if (rbLicense.IsChecked == true) return "License";
-		if (rb100w.IsChecked == true) return "100W";
-		if (rb1020w.IsChecked == true) return "10(20)W";
-		return "5W";
-	}
-
-	private ContestPower ConvertCategoryPowerToEnum() {
-		if (rbLicense.IsChecked == true) return ContestPower.License;
-		if (rb100w.IsChecked == true) return ContestPower.Hundred;
-		if (rb1020w.IsChecked == true) return ContestPower.TwentyTen;
-		return ContestPower.Five;
-	}
-
-	private ContestPower GetContestPowerEnumFromStr(string Str) {
-		switch (Str) {
-			case "License":
-				return ContestPower.License;
-			case "100W":
-				return ContestPower.Hundred;
-			case "10(20)W":
-				return ContestPower.TwentyTen;
-			case "5W":
-				return ContestPower.Five;
-			default:
-				return ContestPower.None;
-		}
-	}
-
-	private void CheckCategoryPowerByConvertenStr(string Str) {
-		switch (Str) {
-			case "License":
-				rbLicense.IsChecked = true;
+			st.ContestName = cbContestName.Text;
+			foreach (var dp in Plugins) {
+				if (dp.contestName != st.ContestName) continue;
+				st.CategoryCode = dp.GetCodeWithPower(cbCategory.Text.Substring(1, cbCategory.Text.IndexOf(")") - 1), ConvertCategoryPowerToEnum());
+				st.IsSubCnEnabled = dp.isSubCnEnabled;
 				break;
-			case "100W":
-				rb100w.IsChecked = true;
-				break;
-			case "10(20)W":
-				rb1020w.IsChecked = true;
-				break;
-			case "5W":
-				rb5w.IsChecked = true;
-				break;
-			default:
-				break;
-		}
-	}
-
-	private void cbContestName_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-		var cb = sender as ComboBox;
-		var selected = cb.SelectedItem as ComboBoxItem;
-		if (selected == null) return;
-		FillCategory(selected.Content as string);
-		foreach (var dp in Plugins) {
-			if (dp.contestName != selected.Content as string) continue;
-			if (dp.isCoefficientEnabled) {
-				cbCoefficient.IsEnabled = true;
-				cbCoefficient.IsChecked = true;
-			} else {
-				cbCoefficient.IsEnabled = false;
-				cbCoefficient.IsChecked = false;
 			}
-			if (dp.isSubCnEnabled) {
-				tbSubContestNo.IsEnabled = true;
-			} else {
-				tbSubContestNo.IsEnabled = false;
+			st.CategoryName = cbCategory.Text.Substring(cbCategory.Text.IndexOf(")") + 1);
+			st.CategoryPower = ConvertCategoryPowerToStr();
+			st.IsCoefficientEnabled = cbCoefficient.IsChecked == true ? true : false;
+			st.Contestno = tbMainContestNo.Text;
+			st.SubContestno = tbSubContestNo.Text;
+			st.SentCnExtra = extra;
+			st.PowerType = rbNormal.IsChecked == true ? "定格出力" : "実測出力";
+			st.PowerVal = cbPowerValue.Text;
+			st.IsAutoOperatorEditEnabled = cbAutoOperator.IsChecked == true ? true : false;
+			if (!st.IsAutoOperatorEditEnabled) {
+				st.Operator = tbOperator.Text;
 			}
-			break;
-		}
-	}
+			st.Callsign = tbCallSign.Text;
+			st.ZipCode = tbZipCode.Text;
+			st.Address = tbAddress.Text;
+			st.Phone = tbPhone.Text;
+			st.Name = tbName.Text;
+			st.Mail = tbMail.Text;
+			st.LicenserName = tbLicenserName.Text;
+			st.LicenserLicense = cbLincenserLicense.Text;
+			st.Place = tbPlace.Text;
+			st.Supply = tbSupply.Text;
+			st.Equip = tbEquip.Text;
+			st.UseType = tbUseType.Text;
+			st.Comment = tbComment.Text;
+			st.Oath = tbOath.Text;
 
-	private void cbCategory_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-		var cb = sender as ComboBox;
-		var selected = cb.SelectedItem as ComboBoxItem;
-		if (selected == null) return;
-		foreach (var dp in Plugins) {
-			if (dp.contestName != ((cbContestName as ComboBox).SelectedItem as ComboBoxItem).Content as string) continue;
-			string cont = selected.Content as string;
-			ChangeEnablalContestPower(dp.GetPowerAllowed(cont.Substring(1, cont.IndexOf(")") - 1)));
-			break;
+			return st;
 		}
-	}
 
-	private void FillCategory(string ContestName) {
-		cbCoefficient.IsEnabled = false;
-		cbCoefficient.IsChecked = false;
-		ChangeEnablalContestPower(ContestPower.None);
-		cbCategory.Items.Clear();
-		foreach (var dp in Plugins) {
-			if (dp.contestName != ContestName) continue;
-			tbOath.Text = dp.oath;
-			foreach (var cc in dp.contestCategories) {
-				cbCategory.Items.Add(new ComboBoxItem() {
-					Content = "(" + cc.Code + ")" + cc.Name,
-				});
+		private string ConvertCategoryPowerToStr() {
+			if (rbLicense.IsChecked == true) return "License";
+			if (rb100w.IsChecked == true) return "100W";
+			if (rb1020w.IsChecked == true) return "10(20)W";
+			return "5W";
+		}
+
+		private ContestPower ConvertCategoryPowerToEnum() {
+			if (rbLicense.IsChecked == true) return ContestPower.License;
+			if (rb100w.IsChecked == true) return ContestPower.Hundred;
+			if (rb1020w.IsChecked == true) return ContestPower.TwentyTen;
+			return ContestPower.Five;
+		}
+
+		private ContestPower GetContestPowerEnumFromStr(string Str) {
+			switch (Str) {
+				case "License":
+					return ContestPower.License;
+				case "100W":
+					return ContestPower.Hundred;
+				case "10(20)W":
+					return ContestPower.TwentyTen;
+				case "5W":
+					return ContestPower.Five;
+				default:
+					return ContestPower.None;
 			}
-			cbCategory.IsEnabled = true;
-			break;
+		}
+
+		private void CheckCategoryPowerByConvertenStr(string Str) {
+			switch (Str) {
+				case "License":
+					rbLicense.IsChecked = true;
+					break;
+				case "100W":
+					rb100w.IsChecked = true;
+					break;
+				case "10(20)W":
+					rb1020w.IsChecked = true;
+					break;
+				case "5W":
+					rb5w.IsChecked = true;
+					break;
+				default:
+					break;
+			}
+		}
+
+		private void cbContestName_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+			var cb = sender as ComboBox;
+			var selected = cb.SelectedItem as ComboBoxItem;
+			if (selected == null) return;
+			FillCategory(selected.Content as string);
+			foreach (var dp in Plugins) {
+				if (dp.contestName != selected.Content as string) continue;
+				if (dp.isCoefficientEnabled) {
+					cbCoefficient.IsEnabled = true;
+					cbCoefficient.IsChecked = true;
+				} else {
+					cbCoefficient.IsEnabled = false;
+					cbCoefficient.IsChecked = false;
+				}
+				if (dp.isSubCnEnabled) {
+					tbSubContestNo.IsEnabled = true;
+				} else {
+					tbSubContestNo.IsEnabled = false;
+				}
+				break;
+			}
+		}
+
+		private void cbCategory_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+			var cb = sender as ComboBox;
+			var selected = cb.SelectedItem as ComboBoxItem;
+			if (selected == null) return;
+			foreach (var dp in Plugins) {
+				if (dp.contestName != ((cbContestName as ComboBox).SelectedItem as ComboBoxItem).Content as string) continue;
+				string cont = selected.Content as string;
+				ChangeEnablalContestPower(dp.GetPowerAllowed(cont.Substring(1, cont.IndexOf(")") - 1)));
+				break;
+			}
+		}
+
+		private void FillCategory(string ContestName) {
+			cbCoefficient.IsEnabled = false;
+			cbCoefficient.IsChecked = false;
+			ChangeEnablalContestPower(ContestPower.None);
+			cbCategory.Items.Clear();
+			foreach (var dp in Plugins) {
+				if (dp.contestName != ContestName) continue;
+				tbOath.Text = dp.oath;
+				foreach (var cc in dp.contestCategories) {
+					cbCategory.Items.Add(new ComboBoxItem() {
+						Content = "(" + cc.Code + ")" + cc.Name,
+					});
+				}
+				cbCategory.IsEnabled = true;
+				break;
+			}
+		}
+
+		private void ChangeEnablalContestPower(ContestPower cp) {
+			rb100w.IsEnabled = rb1020w.IsEnabled = rb5w.IsEnabled = rbLicense.IsEnabled = false;
+			rb100w.IsChecked = rb1020w.IsChecked = rb5w.IsChecked = rbLicense.IsChecked = false;
+			if (cp == ContestPower.None) return;
+			if (cp.HasFlag(ContestPower.License)) rbLicense.IsEnabled = true;
+			if (cp.HasFlag(ContestPower.Hundred)) rb100w.IsEnabled = true;
+			if (cp.HasFlag(ContestPower.TwentyTen)) rb1020w.IsEnabled = true;
+			if (cp.HasFlag(ContestPower.Five)) rb5w.IsEnabled = true;
+		}
+
+		private void cbAutoOperator_Checked(object sender, RoutedEventArgs e) {
+			tbOperator.IsEnabled = false;
+		}
+
+		private void cbAutoOperator_Unchecked(object sender, RoutedEventArgs e) {
+			tbOperator.IsEnabled = true;
+		}
+
+		private void btEquipSet_Click(object sender, RoutedEventArgs e) {
+			Equip eq = new Equip();
+			eq.ShowDialog();
+			if (eq.isChanged) tbEquip.Text = eq.EquipStr;
+		}
+
+		private void btScnExtra_Click(object sender, RoutedEventArgs e) {
+			ContestNo cn = new ContestNo(extra);
+			cn.ShowDialog();
+			if (cn.retEx != null) extra = cn.retEx;
 		}
 	}
-
-	private void ChangeEnablalContestPower(ContestPower cp) {
-		rb100w.IsEnabled = rb1020w.IsEnabled = rb5w.IsEnabled = rbLicense.IsEnabled = false;
-		rb100w.IsChecked = rb1020w.IsChecked = rb5w.IsChecked = rbLicense.IsChecked = false;
-		if (cp == ContestPower.None) return;
-		if (cp.HasFlag(ContestPower.License)) rbLicense.IsEnabled = true;
-		if (cp.HasFlag(ContestPower.Hundred)) rb100w.IsEnabled = true;
-		if (cp.HasFlag(ContestPower.TwentyTen)) rb1020w.IsEnabled = true;
-		if (cp.HasFlag(ContestPower.Five)) rb5w.IsEnabled = true;
-	}
-
-	private void cbAutoOperator_Checked(object sender, RoutedEventArgs e) {
-		tbOperator.IsEnabled = false;
-	}
-
-	private void cbAutoOperator_Unchecked(object sender, RoutedEventArgs e) {
-		tbOperator.IsEnabled = true;
-	}
-
-	private void btEquipSet_Click(object sender, RoutedEventArgs e) {
-		Equip eq = new Equip();
-		eq.ShowDialog();
-		if (eq.isChanged) tbEquip.Text = eq.EquipStr;
-	}
-
-	private void btScnExtra_Click(object sender, RoutedEventArgs e) {
-		ContestNo cn = new ContestNo(extra);
-		cn.ShowDialog();
-		if (cn.retEx != null) extra = cn.retEx;
-	}
-}
 }

@@ -81,7 +81,7 @@ namespace LogProc {
 
 		public void CreateLog(bool sheetType = true) {
 			opLog = "";
-			if (sheetType) opLog += "<LOGSHEET TYPE=CTESTWIN>\r\n";
+			if (sheetType) opLog += "<LOGSHEET TYPE=" + Work.Config.UseType + ">\r\n";
 			opLog += "mon day time callsign        sent       rcvd       multi  MHz  mode pts memo\r\n";
 			foreach (var l in Work.Log) {
 				if (l.Point == 0) continue;

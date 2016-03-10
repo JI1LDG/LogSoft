@@ -89,6 +89,8 @@
 						<Button Content="設定" DockPanel.Dock="Right" Name="btEquipSet" Click="btEquipSet_Click"/>
 						<TextBox Name="tbEquip"/>
 					</DockPanel>
+					<Label Content="使用ロギングソフト・ログ形式"/>
+					<TextBox Name="tbUseType"/>
 					<Label Content="意見"/>
 					<TextBox Name="tbComment" MinLines="2" TextWrapping="Wrap"/>
 					<Label Content="宣誓文"/>
