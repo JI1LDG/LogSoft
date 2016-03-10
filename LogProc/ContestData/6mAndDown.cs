@@ -20,6 +20,10 @@ namespace LogProc {
 				Name = "電話部門シングルオペオールバンド",
 				Code = "PA",
 			},
+			new CategoryData() {
+				Name = "電話部門シングルオペオールバンドD-STAR",
+				Code = "PD",
+			},
 			new CategoryData(){
 				Name = "電話部門シングルオペニューカマー",
 				Code = "PN",
