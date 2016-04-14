@@ -47,7 +47,7 @@ namespace LogProc {
 		}
 
 		private void WarnRule() {
-			if(MessageBox.Show("このソフトウェアを使用してログの修正・確認を行なうことは、平成28年3月7日にJARLコンテスト委員会より発表された、4月以降のJARLコンテストから適用されるコンテスト規約(http://www.jarl.org/Japanese/1_Tanoshimo/1-1_Contest/Contest.htm)の禁止事項に反する可能性があります。\r\n\r\n自己責任で使用できる方は「はい」を、使用できない方は「いいえ」を選択し、終了してください。", "通知", MessageBoxButton.YesNo) == MessageBoxResult.No) {
+			if(MessageBox.Show("このソフトウェアを使用してログの修正・確認を行なうことは、平成28年3月7日にJARLコンテスト委員会より発表された、コンテスト規約(http://www.jarl.org/Japanese/1_Tanoshimo/1-1_Contest/Contest.htm)の禁止事項に反する可能性があります。\r\n\r\n自己責任で使用できる方は「はい」を、使用できない方は「いいえ」を選択し、終了してください。", "通知", MessageBoxButton.YesNo) == MessageBoxResult.No) {
 				this.Close();
 			} else {
 				System.IO.StreamWriter sw = new System.IO.StreamWriter("check.ls", false, System.Text.Encoding.UTF8);
