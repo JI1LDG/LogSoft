@@ -82,7 +82,7 @@ namespace LogProc {
 		public void CreateLog(bool sheetType = true) {
 			opLog = "";
 			if (sheetType) opLog += "<LOGSHEET TYPE=" + Work.Config.UseType + ">\r\n";
-			opLog += "mon day time callsign        sent       rcvd       multi  MHz  mode pts memo\r\n";
+			opLog += "DATA(JST) TIME BAND MODE CALLSIGN SENTNo RCVNo Multi PTS\r\n";
 			foreach (var l in Work.Log) {
 				if (l.Point == 0) continue;
 				bool mul = false;
@@ -104,18 +104,24 @@ namespace LogProc {
 					});
 					mul = true;
 				}
-				opLog += l.Date.Month.ToString().PadRight(4) + l.Date.Day.ToString().PadRight(4) + l.Date.ToString("HHmm ");
-
-				opLog += l.Callsign.PadRight(15 + 1) + l.SentCn.PadRight(10 + 1) + l.ReceivedCn.PadRight(10 + 1);
-				if (mul) opLog += areano.ToString().PadRight(6 + 1);
-				else opLog += "".PadRight(6 + 1);
-				opLog += DivFreqNum(l.Freq).PadRight(5) + l.Mode.PadRight(5);
-				opLog += l.Point.ToString().PadRight(4);
-				if (sheetType == false) {
-					opLog += "%%" + l.Operator + "%%" + "\r\n";
+				opLog += l.Date.Year.ToString() + "-" + l.Date.Month.ToString() + "-" + l.Date.Day.ToString() + l.Date.ToString(" HH:mm ");
+				opLog += DivFreqNum(l.Freq) + " " + l.Mode + " " + l.Callsign + " ";
+				Match mm, mn;
+				if(l.Mode == "CW") {
+					mm = Regex.Match(l.SentCn, @"(\d\d\d)(.*)");
+					mn = Regex.Match(l.ReceivedCn, @"(\d\d\d)(.*)");
 				} else {
-					opLog += l.Operator + "\r\n";
+					mm = Regex.Match(l.SentCn, @"(\d\d)(.*)");
+					mn = Regex.Match(l.ReceivedCn, @"(\d\d)(.*)");
 				}
+				opLog += mm.Groups[1].Value + " " + mm.Groups[2].Value + " ";
+				opLog += mn.Groups[1].Value + " " + mn.Groups[2].Value + " ";
+				if (mul) {
+					opLog += areano.ToString() + " ";
+				} else {
+					opLog += "- ";
+				}
+				opLog += l.Point + "\r\n";
 			}
 			if (sheetType) opLog += "</LOGSHEET>\r\n";
 		}
