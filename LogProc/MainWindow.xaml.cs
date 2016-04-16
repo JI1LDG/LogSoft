@@ -19,41 +19,20 @@ namespace LogProc {
 		private WorkingData Work { get; set; }
 		private List<InterSet> Intersets { get; set; }
 		private InterSet nowItst { get; set; }
-		private string Version { get { return "0.8.53"; } }
-		private string BuildTime { get { return "20160414"; } }
+		private string Version { get { return "0.8.54-alpha"; } }
+		private string BuildTime { get { return "2016****"; } }
 
 		public MainWindow() {
-			try {
-				if (System.IO.File.Exists("check.ls")) {
-					System.IO.StreamReader sr = new System.IO.StreamReader("check.ls", System.Text.Encoding.UTF8);
-					if (sr.Peek() >= 0) {
-						if (Version != sr.ReadLine()) WarnRule();
-					}
-					sr.Close();
-				} else WarnRule();
-			} catch {
-				WarnRule();
-			}
 			Work = new WorkingData();
 			Work.Log = new ObservableCollection<LogData>();
 
 			InitializeComponent();
-			this.Title = "ログ集計支援ソフト(Ver: " + Version + ")";
+			this.Title += "(Ver: " + Version + ")";
 			SetInterset();
 			List<IDefine> defPlugins = new List<IDefine>();
 			foreach(var i in Intersets) defPlugins.Add(i.Def);
 			ConfTab.Plugins = defPlugins.ToArray();
 			dgLog.ItemsSource = Work.Log;
-		}
-
-		private void WarnRule() {
-			if(MessageBox.Show("このソフトウェアを使用してログの修正・確認を行なうことは、平成28年3月7日にJARLコンテスト委員会より発表された、4月以降のJARLコンテストから適用されるコンテスト規約(http://www.jarl.org/Japanese/1_Tanoshimo/1-1_Contest/Contest.htm)の禁止事項に反する可能性があります。\r\n\r\n自己責任で使用できる方は「はい」を、使用できない方は「いいえ」を選択し、終了してください。", "通知", MessageBoxButton.YesNo) == MessageBoxResult.No) {
-				this.Close();
-			} else {
-				System.IO.StreamWriter sw = new System.IO.StreamWriter("check.ls", false, System.Text.Encoding.UTF8);
-				sw.Write(Version);
-				sw.Close();
-			}
 		}
 
 		private void SetInterset() {
@@ -325,7 +304,7 @@ namespace LogProc {
 		}
 
 		private void miVersionInfo_Click(object sender, RoutedEventArgs e) {
-			MessageBox.Show("ログ集計支援ソフト（名前はまだない）\r\nVer:" + Version + "(Build:" + BuildTime + ")\r\nAuthor/Developer: JI1LDG(@Yama_LDG)\r\nForm Designer / Adviser: JI1EPL\r\n無線局情報の検索に総務省の「無線局等情報検索(http://www.tele.soumu.go.jp/musen/SearchServlet?pageID=1)」を使用しています。", "バージョン情報");
+			MessageBox.Show("Ver:" + Version + "(Build:" + BuildTime + ")\r\nAuthor/Developer: JI1LDG\r\nForm Designer / Adviser: JI1EPL\r\n無線局情報の検索に総務省の「無線局等情報検索(http://www.tele.soumu.go.jp/musen/SearchServlet?pageID=1)」を使用しています。", "バージョン情報");
 		}
 
 		private void miDBInit_Click(object sender, RoutedEventArgs e) {
