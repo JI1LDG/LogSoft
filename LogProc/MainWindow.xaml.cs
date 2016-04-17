@@ -38,7 +38,7 @@ namespace LogProc {
 			Work.Log = new ObservableCollection<LogData>();
 
 			InitializeComponent();
-			this.Title = "ログ集計支援ソフト(Ver: " + Version + ")";
+			this.Title += "(Ver: " + Version + ")";
 			SetInterset();
 			List<IDefine> defPlugins = new List<IDefine>();
 			foreach(var i in Intersets) defPlugins.Add(i.Def);

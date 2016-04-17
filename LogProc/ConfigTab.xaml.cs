@@ -74,6 +74,8 @@ namespace LogProc {
 								sw.Close();
 							}
 							break;
+						case "0.8.50":
+							break;
 						default:
 							MessageBox.Show("不正な設定ファイルです。", "通知");
 							break;
