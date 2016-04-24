@@ -48,7 +48,7 @@ namespace LogProc {
 			var setCl = (Setting)serial.Deserialize(sr);
 			sr.Close();
 			if (setCl.Version != defs.SettingVer) {
-				if (MessageBox.Show("古い形式の設定ファイルです。新しい形式に変換しますか？\r\n変換せずに処理を続行させることはできますが、一部項目が読み込めないことがあります。", "通知", MessageBoxButton.YesNo) == MessageBoxResult.Yes) {
+				if (MessageBox.Show("古い、互換性のない形式の設定ファイルです。新しい形式に変換しますか？\r\n変換せずに処理を続行させることはできますが、一部項目が読み込めないことがあります。", "通知", MessageBoxButton.YesNo) == MessageBoxResult.Yes) {
 					switch (setCl.Version) {
 						case "0.8.1":
 							serial = new System.Xml.Serialization.XmlSerializer(typeof(Definitions.v0810.Setting));
@@ -56,7 +56,7 @@ namespace LogProc {
 							var st0810 = (Definitions.v0810.Setting)serial.Deserialize(sr);
 							sr.Close();
 
-							setCl.Version = "0.8.50";
+							setCl.Version = defs.SettingVer;
 							setCl.IsCoefficientEnabled = st0810.Coefficient;
 							setCl.Contestno = st0810.ContestNo;
 							setCl.SubContestno = st0810.SubContestNo;

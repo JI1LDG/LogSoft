@@ -132,7 +132,7 @@ namespace LogProc {
 		}
 
 		private void CheckBox_Click(object sender, RoutedEventArgs e) {
-			Update();
+			//Update();
 			List<EquipNum> len = new List<EquipNum>();
 			bool ok;
 			foreach(var eq in gEquip) {
@@ -151,6 +151,7 @@ namespace LogProc {
 					Num = 1,
 				});
 			}
+
 			tbPreview.Text = "";
 			for(int i = 0;i < len.Count;i++) {
 				if(i != 0) tbPreview.Text += ",";
