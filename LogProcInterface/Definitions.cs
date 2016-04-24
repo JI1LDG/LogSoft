@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 namespace LogProc {
 	namespace Definitions {
 		public class defs {
-			public const string SettingVer = "0.8.50";
+			public const string SettingVer = "0.8.53";
 			public static string[][] PrefList() {
 				string[][] tmp = new string[][] {
 				new string[] {"長野", "新潟"},

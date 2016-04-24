@@ -15,9 +15,9 @@
 				<DataGridTemplateColumn IsReadOnly="True" Header="使用">
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
-							<CheckBox IsChecked="{Binding isEquipen, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+							<CheckBox IsChecked="{Binding IsEquiped, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                               HorizontalAlignment="Center"
-                              VerticalAlignment="Center" Click="CheckBox_Click">
+                              VerticalAlignment="Center" Click="CheckBox_Click"  Name="chkbx">
 							</CheckBox>
 						</DataTemplate>
 					</DataGridTemplateColumn.CellTemplate>
