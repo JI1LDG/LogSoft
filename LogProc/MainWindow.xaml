@@ -9,7 +9,7 @@
 		<Menu DockPanel.Dock="Top">
 			<MenuItem Header="ファイル" Name="miFile">
 				<MenuItem Header="ログファイル読み込み（追加）" Name="miAddFile" Click="miAddFile_Click"/>
-				<MenuItem Header="ログファイル出力" Name="miOutputFile" Click="miOutputFile_Click" IsEnabled="False"/>
+				<MenuItem Header="ログファイル出力" Name="miOutputFile" Click="miOutputFile_Click"/>
 				<MenuItem Header="作業ファイル読み込み" Name="miLoadWork" Click="miLoadWork_Click"/>
 				<MenuItem Header="作業ファイル保存" Name="miSaveWork" Click="miSaveWork_Click"/>
 				<MenuItem Header="終了" Name="miExit" Click="miExit_Click"/>

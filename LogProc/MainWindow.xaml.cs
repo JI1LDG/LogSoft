@@ -113,7 +113,7 @@ namespace LogProc {
 				return;
 			}
 			var ol = new OutputLog(Work, nowItst.Sum);
-			ol.CreateLog(false);
+			ol.CreateLog(false, false);
 			string output = ol.opLog;
 			if (output == null) {
 				MessageBox.Show("ログ生成に失敗しました。", "通知");
