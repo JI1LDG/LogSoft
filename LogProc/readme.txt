@@ -1,4 +1,5 @@
-﻿ログ集計支援ソフト Ver:0.8.54(rev:32, Build:20160425)
+﻿ログ集計支援ソフト Ver:0.8.60(rev:33, Build:20160628)
+This software is released under the MIT License, see LICENSE.txt.
 
 ******** 注意 ********
 平成28年3月7日にJARLコンテスト委員会より発表された、4月以降のJARLコンテストから適用されるコンテスト規約(http://www.jarl.org/Japanese/1_Tanoshimo/1-1_Contest/Contest.htm)の禁止事項に反する可能性があります。使用する際は自己責任でお願いします。
@@ -59,6 +60,10 @@ URL: https://htmlagilitypack.codeplex.com/
 
 
 ・更新履歴
+Rev:33(0.8.60) 2016/06/28
+MITライセンス適用
+ログ解析機能追加。件数の表示
+
 Rev:32(0.8.54) 2016/04/25
 設備リストのバグ修正
 初回起動の挙動おかしいのを修正

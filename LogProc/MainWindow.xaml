@@ -16,6 +16,7 @@
 			</MenuItem>
 			<MenuItem Header="ツール" Name="miTool">
 				<MenuItem Header="DB初期化/新規作成" Name="miDBInit" Click="miDBInit_Click"/>
+				<MenuItem Header="ログ解析" Name="miLogAlysc" Click="miLogAlysc_Click"/>
 			</MenuItem>
 			<MenuItem Header="ヘルプ" Name="miHelp">
 				<MenuItem Header="バージョン情報" Name="miVersionInfo" Click="miVersionInfo_Click"/>

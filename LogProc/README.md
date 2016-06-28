@@ -1,5 +1,7 @@
 ﻿# LogSoft
 JA1YPZ用ログ集計支援ソフト<br>
+This software is released under the MIT License, see LICENSE.txt.
+
 国内コンテストのログ集計を支援するソフトウェアです。<br>
 出力される電子ログなどの信頼性は保証しかねます。<br>
 対応コンテストはALL JA, オール神奈川, 6mAndDown, フィールドデー, 全市全郡, 関東UHFコンテスト

@@ -114,6 +114,9 @@
       <DependentUpon>Equipments.xaml</DependentUpon>
     </Compile>
     <Compile Include="LoadLog.cs" />
+    <Compile Include="LogAlysc.xaml.cs">
+      <DependentUpon>LogAlysc.xaml</DependentUpon>
+    </Compile>
     <Compile Include="NumericControl.xaml.cs">
       <DependentUpon>NumericControl.xaml</DependentUpon>
     </Compile>
@@ -138,6 +141,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Equipments.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LogAlysc.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -208,6 +215,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="AreaData\NTT.area.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="LICENSE.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.98.1\build\net451\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.98.1\build\net451\System.Data.SQLite.Core.targets')" />

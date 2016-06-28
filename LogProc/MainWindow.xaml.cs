@@ -19,8 +19,8 @@ namespace LogProc {
 		private WorkingData Work { get; set; }
 		private List<InterSet> Intersets { get; set; }
 		private InterSet nowItst { get; set; }
-		private string Version { get { return "0.8.54"; } }
-		private string BuildTime { get { return "20160425"; } }
+		private string Version { get { return "0.8.60"; } }
+		private string BuildTime { get { return "20160628"; } }
 
 		public MainWindow() {
 			try {
@@ -49,7 +49,7 @@ namespace LogProc {
 		}
 
 		private void WarnRule() {
-			if (MessageBox.Show("このソフトウェアを使用してログの修正・確認を行なうことは、平成28年3月7日にJARLコンテスト委員会より発表された、4月以降のJARLコンテストから適用されるコンテスト規約(http://www.jarl.org/Japanese/1_Tanoshimo/1-1_Contest/Contest.htm)の禁止事項に反する可能性があります。\r\n\r\n自己責任で使用できる方は「はい」を、使用できない方は「いいえ」を選択し、終了してください。", "通知", MessageBoxButton.YesNo) == MessageBoxResult.No) {
+			if (MessageBox.Show("このソフトウェアを使用してコンテストログの修正・確認を行なうことは、平成28年3月7日にJARLコンテスト委員会より発表された、4月以降のJARLコンテストから適用されるコンテスト規約(http://www.jarl.org/Japanese/1_Tanoshimo/1-1_Contest/Contest.htm)の禁止事項に反する可能性があります。\r\n\r\n自己責任で使用できる方は「はい」を、使用できない方は「いいえ」を選択し、終了してください。", "通知", MessageBoxButton.YesNo) == MessageBoxResult.No) {
 				this.Close();
 			} else {
 				System.IO.StreamWriter sw = new System.IO.StreamWriter("check.ls", false, System.Text.Encoding.UTF8);
@@ -381,6 +381,12 @@ namespace LogProc {
 				e.Effects = DragDropEffects.None;
 			}
 			e.Handled = true;
+		}
+
+		private void miLogAlysc_Click(object sender, RoutedEventArgs e) {
+			UpdateData();
+			LogAlysc la = new LogAlysc(Work.Log);
+			la.ShowDialog();
 		}
 	}
 

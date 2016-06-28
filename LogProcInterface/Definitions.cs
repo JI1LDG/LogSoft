@@ -198,6 +198,36 @@ namespace LogProc {
 			}
 		}
 
+		public class AlyscData {
+			public string Name { get; set; }
+			public int Num { get; set; }
+			public int False { get; set; }
+			public int Rate0 { get; set; }
+			public int Rate1 { get; set; }
+			public int Rate2 { get; set; }
+			public int Rate3 { get; set; }
+			public int Rate4 { get; set; }
+			public int Rate5 { get; set; }
+			public string Percentage { get { return ((double)(Num - False) / Num * 100).ToString("F2") + "%"; } }
+
+			public AlyscData(string name) {
+				Name = name;
+			}
+
+			public void Set(LogData log) {
+				Num++;
+				if (log.IsRate0) Rate0++;
+				else {
+					False++;
+					if (log.IsRate1) Rate1++;
+					if (log.IsRate2) Rate2++;
+					if (log.IsRate3) Rate3++;
+					if (log.IsRate4) Rate4++;
+					if (log.IsRate5) Rate5++;
+				}
+			}
+		}
+
 		public class CategoryData {
 			public string Name { get; set; }
 			public string Code { get; set; }

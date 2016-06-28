@@ -1,0 +1,26 @@
+﻿<Window x:Class="LogProc.LogAlysc"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LogProc"
+		xmlns:def="clr-namespace:LogProc.Definitions;assembly=LogProcInterface"
+        mc:Ignorable="d"
+        Title="ログ解析" Height="300" Width="400">
+	<DockPanel>
+		<DataGrid Grid.Row="0" Name="dgAlysc" AutoGenerateColumns="False" IsReadOnly="True">
+			<DataGrid.Columns>
+				<DataGridTextColumn Header="名前" Binding="{Binding Name}"/>
+				<DataGridTextColumn Header="件数" Binding="{Binding Num}"/>
+				<DataGridTextColumn Header="エラーなし" Binding="{Binding Rate0}"/>
+				<DataGridTextColumn Header="エラーあり" Binding="{Binding False}"/>
+				<DataGridTextColumn Header="Lv.1" Binding="{Binding Rate1}"/>
+				<DataGridTextColumn Header="Lv.2" Binding="{Binding Rate2}"/>
+				<DataGridTextColumn Header="Lv.3" Binding="{Binding Rate3}"/>
+				<DataGridTextColumn Header="Lv.4" Binding="{Binding Rate4}"/>
+				<DataGridTextColumn Header="Lv.5" Binding="{Binding Rate5}"/>
+				<DataGridTextColumn Header="整合率" Binding="{Binding Percentage}"/>
+			</DataGrid.Columns>
+		</DataGrid>
+	</DockPanel>
+</Window>
