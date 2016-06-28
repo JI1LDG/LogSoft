@@ -1,5 +1,7 @@
 # LogSoft
 
+This software is released under the MIT License, see LICENSE.txt(in LogProc Folder).
+
 &lt;注意&gt;
 
 新しいコンテストログ形式に対応しました。不具合がありましたら連絡をお願いします。
