@@ -15,8 +15,10 @@
 				<MenuItem Header="終了" Name="miExit" Click="miExit_Click"/>
 			</MenuItem>
 			<MenuItem Header="ツール" Name="miTool">
-				<MenuItem Header="DB初期化/新規作成" Name="miDBInit" Click="miDBInit_Click"/>
 				<MenuItem Header="ログ解析" Name="miLogAlysc" Click="miLogAlysc_Click"/>
+				<MenuItem Header="Dupeチェック" Name="miDupeChk" Click="miDupeChk_Click"/>
+				<Separator/>
+				<MenuItem Header="DB初期化/新規作成" Name="miDBInit" Click="miDBInit_Click"/>
 			</MenuItem>
 			<MenuItem Header="ヘルプ" Name="miHelp">
 				<MenuItem Header="バージョン情報" Name="miVersionInfo" Click="miVersionInfo_Click"/>
@@ -31,6 +33,8 @@
 			<Label Content="0" Name="lbUnavailenLogNum"/>
 			<Label Content="エラーログ件数"/>
 			<Label Content="0" Name="lbErrorenLogNum"/>
+			<Label Content="Dupe件数"/>
+			<Label Content="0(0)" Name="lbDupenLogNum"/>
 			<Label Content="設定:未設定" Name="lbSettingConfigen"/>
 		</StatusBar>
 		<Grid DockPanel.Dock="Left">

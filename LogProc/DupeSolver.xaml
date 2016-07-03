@@ -1,0 +1,44 @@
+﻿<Window x:Class="LogProc.DupeSolver"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LogProc"
+        mc:Ignorable="d"
+        Title="DupeSolver" Height="300" Width="550">
+    <Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="auto"/>
+			<RowDefinition/>
+			<RowDefinition Height="auto"/>
+		</Grid.RowDefinitions>
+		<StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
+			<Button Name="btMinus" Click="btMinus_Click"/>
+			<TextBox Name="tbCount" PreviewTextInput="tbCount_PreviewTextInput" Text="0"/>
+			<Button Name="btPlus" Click="btPlus_Click"/>
+			<Separator/>
+			<Button Name="btTryon" Content="移動" Click="btTryon_Click"/>
+		</StackPanel>
+		<DataGrid Grid.Row="1" Name="dgLog" AutoGenerateColumns="False" ItemsSource="{Binding Log, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Language="ja-JP" CanUserDeleteRows="False" CanUserAddRows="False">
+			<DataGrid.Columns>
+				<DataGridTextColumn Header="日時" Binding="{Binding Date, StringFormat=g}"/>
+				<DataGridTextColumn Header="コールサイン" Binding="{Binding Callsign}"/>
+				<DataGridTextColumn Header="自局CN" Binding="{Binding SentCn}"/>
+				<DataGridTextColumn Header="相手CN" Binding="{Binding ReceivedCn}"/>
+				<DataGridTextColumn Header="周波数" Binding="{Binding Freq}"/>
+				<DataGridTextColumn Header="モード" Binding="{Binding Mode}"/>
+				<DataGridTextColumn Header="オペレータ" Binding="{Binding Operator}"/>
+				<DataGridTextColumn Header="コメント" Binding="{Binding Rem}"/>
+				<DataGridTextColumn Header="エラー詳細" Binding="{Binding FailedStr}" IsReadOnly="True"/>
+				<DataGridTextColumn Header="得点" Binding="{Binding Point}" IsReadOnly="True"/>
+			</DataGrid.Columns>
+		</DataGrid>
+		<DockPanel Grid.Row="2">
+			<Button Content="Reset" Name="btReset" DockPanel.Dock="Left" Click="btReset_Click"/>
+			<Button Content="Cancel" Name="btCancel" DockPanel.Dock="Left" Click="btCancel_Click"/>
+			<Button Content="Execute" Name="btExecute" DockPanel.Dock="Right" Click="btExecute_Click"/>
+			<Button Content="Delete" Name="btDelete" DockPanel.Dock="Right" Click="btDelete_Click"/>
+			<Label/>
+		</DockPanel>
+    </Grid>
+</Window>

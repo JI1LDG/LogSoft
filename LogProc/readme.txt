@@ -1,4 +1,4 @@
-﻿ログ集計支援ソフト Ver:0.8.60(rev:33, Build:20160628)
+﻿ログ集計支援ソフト Ver:0.8.61(rev:34, Build:20160703)
 This software is released under the MIT License, see LICENSE.txt.
 
 ******** 注意 ********
@@ -60,6 +60,9 @@ URL: https://htmlagilitypack.codeplex.com/
 
 
 ・更新履歴
+Rev:34(0.8.61) 2016/07/03
+重複ログの取捨選択機能の追加
+
 Rev:33(0.8.60) 2016/06/28
 MITライセンス適用
 ログ解析機能追加。件数の表示

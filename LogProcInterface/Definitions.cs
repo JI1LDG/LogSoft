@@ -236,7 +236,7 @@ namespace LogProc {
 		}
 
 		public enum Reason {
-			ReceivedCnUnexists, OutOfFreq, InvalidFreq, OmakuniNonJA, AddressUnmatches, RegionUnmatches, InvalidReceivedCn, GetDataFailed, AnvUnchecked, InvalidSentCn
+			ReceivedCnUnexists, OutOfFreq, InvalidFreq, OmakuniNonJA, AddressUnmatches, RegionUnmatches, InvalidReceivedCn, GetDataFailed, AnvUnchecked, InvalidSentCn, Duplicate
 		}
 
 		public class ErrorReason {
@@ -267,6 +267,7 @@ namespace LogProc {
 				tmp[Reason.OutOfFreq.ToString()] = new ErrorReason(5, "コンテストで使用される周波数ではない、もしくは時間外です。", false);
 				tmp[Reason.InvalidFreq.ToString()] = new ErrorReason(5, "周波数が不正です。ログに出力されません。", false);
 				tmp[Reason.OmakuniNonJA.ToString()] = new ErrorReason(5, "外国局は得点の対象外です。", false);
+				tmp[Reason.Duplicate.ToString()] = new ErrorReason(5, "データが重複しています。", false);
 				tmp[Reason.AddressUnmatches.ToString()] = new ErrorReason(4, "無線局常置場所とコンテストナンバーが一致しません。\r\nもしかして: [Suggest]", false);
 				tmp[Reason.RegionUnmatches.ToString()] = new ErrorReason(4, "エリアナンバーとコンテストナンバーが一致しません。", false);
 				tmp[Reason.InvalidReceivedCn.ToString()] = new ErrorReason(3, "相手局コンテストナンバーが不正です。", false);

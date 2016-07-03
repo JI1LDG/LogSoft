@@ -17,10 +17,11 @@ using LogProc.Utilities;
 namespace LogProc {
 	public partial class MainWindow : Window {
 		private WorkingData Work { get; set; }
+		private ObservableCollection<List<LogData>> Duplicates { get; set; }
 		private List<InterSet> Intersets { get; set; }
 		private InterSet nowItst { get; set; }
-		private string Version { get { return "0.8.60"; } }
-		private string BuildTime { get { return "20160628"; } }
+		private string Version { get { return "0.8.61"; } }
+		private string BuildTime { get { return "20160703"; } }
 
 		public MainWindow() {
 			try {
@@ -75,6 +76,35 @@ namespace LogProc {
 			int unsearchen = 0;
 			int unfinden = 0;
 			int erroren = 0;
+			int dupen = 0;
+			int dupegrpen = 0;
+
+			var listErr = ErrorReason.GetInitial();
+			ErrorReason.Set(listErr, Reason.Duplicate.ToString());
+			string dup = ErrorReason.GetFailedStr(listErr);
+
+			foreach(var l in Work.Log) {
+				while (l.FailedStr.Contains(dup)) {
+					int idx = l.FailedStr.IndexOf(dup);
+					if (idx < 0) break;
+					l.FailedStr = l.FailedStr.Remove(idx, dup.Length);
+				}
+			}
+
+			Duplicates = new ObservableCollection<List<LogData>>();
+			var gb = Work.Log.GroupBy(wl => new { wl.Callsign, wl.Freq }).Where(g => g.Count() > 1).ToList();
+			dupegrpen = gb.Count;
+			foreach(var g in gb) {
+				var tmp = new List<LogData>();
+				dupen += g.Count();
+				for(int i = 0;i < g.Count(); i++) {
+					if (!g.ElementAt(i).FailedStr.Contains(dup)) {
+						g.ElementAt(i).FailedStr += dup;
+					}
+					tmp.Add(g.ElementAt(i));
+				}
+				Duplicates.Add(tmp);
+			}
 
 			lbReadenLogNum.Content = Work.Log.Count;
 			Work.Log = new ObservableCollection<LogData>(Work.Log.OrderByDescending(l => l.FailedStr));
@@ -88,6 +118,11 @@ namespace LogProc {
 			lbUnsearchenLogNum.Content = unsearchen;
 			lbUnavailenLogNum.Content = unfinden;
 			lbErrorenLogNum.Content = erroren;
+			lbDupenLogNum.Content = dupegrpen + "(" + dupen + ")";
+		}
+
+		private void AddLog(LogData log) {
+			Work.Log.Add(log);
 		}
 
 		private void miAddFile_Click(object sender, RoutedEventArgs e) {
@@ -98,7 +133,7 @@ namespace LogProc {
 			}
 			if(ll.ContestLog == null) return;
 			foreach(var ld in ll.ContestLog) {
-				Work.Log.Add(ld);
+				AddLog(ld);
 			}
 
 			UpdateData();
@@ -365,7 +400,7 @@ namespace LogProc {
 						if(ll.ContestLog == null) return;
 						if(Work.Log == null) Work.Log = new ObservableCollection<LogData>();
 						foreach(var ld in ll.ContestLog) {
-							Work.Log.Add(ld);
+							AddLog(ld);
 						}
 
 						UpdateData();
@@ -387,6 +422,18 @@ namespace LogProc {
 			UpdateData();
 			LogAlysc la = new LogAlysc(Work.Log);
 			la.ShowDialog();
+		}
+
+		private void miDupeChk_Click(object sender, RoutedEventArgs e) {
+			UpdateData();
+			if(Duplicates.Count > 0) {
+				var ds = new DupeSolver(Work.Log, Duplicates);
+				ds.ShowDialog();
+				Work.Log = ds.Log;
+				UpdateData();
+			} else {
+				MessageBox.Show("Dupeが検出されませんでした。", "通知");
+			}
 		}
 	}
 
