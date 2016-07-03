@@ -426,7 +426,7 @@ namespace LogProc {
 
 		private void miDupeChk_Click(object sender, RoutedEventArgs e) {
 			UpdateData();
-			if(Duplicates.Count > 0) {
+			if(Duplicates != null && Duplicates.Count > 0) {
 				var ds = new DupeSolver(Work.Log, Duplicates);
 				ds.ShowDialog();
 				Work.Log = ds.Log;
