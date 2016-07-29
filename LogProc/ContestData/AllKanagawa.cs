@@ -197,7 +197,8 @@ namespace LogProc {
 			public List<Area> listMainArea {
 				get {
 					if (_mainArea == null) {
-						_mainArea = Areano.GetList("AllKanagawa");
+						//_mainArea = Areano.GetList("AllKanagawa");
+						_mainArea = Areano.GetMixedListFromPref(new string[] { "11" }, new string[] { "11" });
 					}
 					return _mainArea;
 				}

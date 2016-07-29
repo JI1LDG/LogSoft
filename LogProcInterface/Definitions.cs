@@ -78,9 +78,9 @@ namespace LogProc {
 			private string callsign;
 			public string Callsign { get { return callsign; } set { callsign = value.ToUpper(); } }
 			private string sentCn;
-			public string SentCn { get { return sentCn; } set { sentCn = value.ToUpper(); } }
+			public string SentCn { get { return sentCn; } set { sentCn = value.ToUpper().Trim(); } }
 			private string receivedCn;
-			public string ReceivedCn { get { return receivedCn; } set { receivedCn = value.ToUpper(); } }
+			public string ReceivedCn { get { return receivedCn; } set { receivedCn = value.ToUpper().Trim(); } }
 			public string Mode { get; set; }
 			public string Freq { get; set; }
 			public string Operator { get; set; }

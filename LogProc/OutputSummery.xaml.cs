@@ -57,7 +57,7 @@ namespace LogProc {
 		public void CreateSummery() {
 			Summery = "<SUMMARYSHEET VERSION=R1.0>\r\n";
 			Summery += "<CONTESTNAME>" + Work.Config.ContestName + "</CONTESTNAME>\r\n";
-			Summery += "<CATEGORYCODE>" + Work.Config.CategoryCode + "</CATEGORYCODE>\r\n";
+			if(Work.Config.CategoryCode != "") Summery += "<CATEGORYCODE>" + Work.Config.CategoryCode + "</CATEGORYCODE>\r\n";
 			Summery += "<CATEGORYNAME>" + Work.Config.CategoryName + "</CATEGORYNAME>\r\n";
 			Summery += "<CALLSIGN>" + Work.Config.Callsign + "</CALLSIGN>\r\n";
 			Summery += Plugins.isScoreEdited ? Plugins.getScoreStr() : GetScoreStr();

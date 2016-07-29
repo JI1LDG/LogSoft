@@ -175,7 +175,7 @@ namespace LogProc {
 		}
 		public static class Anv {
 			public static void Check(string callsign, string anvStr, Dictionary<string, ErrorReason> listError, StationData station) {
-				if (callsign[0] != '8') return;
+				if (callsign[0] != '8' || callsign.Substring(0, 2) != "8J") return;
 				string cs = Callsign.GetRemovedStroke(callsign);
 				if (!anvStr.Contains(cs)) {
 					ErrorReason.Set(listError, Reason.AnvUnchecked.ToString());
@@ -231,43 +231,47 @@ namespace LogProc {
 				var AreaData = new List<Area>();
 				while (sr.Peek() > 0) {
 					string buf = sr.ReadLine();
-					switch (buf[0]) {
-						case 'A':
-							var m = Regex.Match(buf, @"A (\d*) (\w*)");
-							AreaData.Add(new Area() { No = m.Groups[1].Value, Address = new List<string>() { m.Groups[2].Value } });
-							break;
-						case 'E':
-							var mc = Regex.Matches(buf, @"E (\d*) (\w*)\(\w*\) (\w*)(, (\w*)){0,}");
-							List<string> ls = new List<string>();
-							ls.Add(mc[0].Groups[2].Captures[0].Value + mc[0].Groups[3].Captures[0].Value);
-							foreach (var tn in mc[0].Groups[5].Captures) {
-								ls.Add(mc[0].Groups[2].Captures[0].Value + (tn as Capture).Value);
-							}
-							AreaData.Add(new Area() { No = mc[0].Groups[1].Value, Address = ls });
-							break;
-						case 'I':
-							var mci = Regex.Matches(buf, @"I (\d*) (\w*)\(\w*\) (\w*)(, (\w*)){0,}");
-							List<string> lsi = new List<string>();
-							lsi.Add(mci[0].Groups[2].Captures[0].Value + mci[0].Groups[3].Captures[0].Value);
-							foreach (var tn in mci[0].Groups[5].Captures) {
-								lsi.Add(mci[0].Groups[2].Captures[0].Value + (tn as Capture).Value);
-							}
-							AreaData.Add(new Area() { No = mci[0].Groups[1].Value, Address = lsi });
-							break;
-						case 'N':
-							var mcn = Regex.Matches(buf, @"N (\d*) (\w*) (\w*)(, (\w*)){0,}");
-							List<string> lsn = new List<string>();
-							lsn.Add(mcn[0].Groups[3].Captures[0].Value);
-							foreach (var ti in mcn[0].Groups[5].Captures) {
-								lsn.Add((ti as Capture).Value);
-							}
-							AreaData.Add(new Area() { No = mcn[0].Groups[1].Value, Address = lsn });
-							break;
-						default: break;
-					}
+					ExecuteFromStr(AreaData, buf);
 				}
 				sr.Close();
 				return AreaData;
+			}
+
+			public static void ExecuteFromStr(List<Area> AreaData, string buf) {
+				switch (buf[0]) {
+					case 'A':
+						var m = Regex.Match(buf, @"A (\d*) (\w*)");
+						AreaData.Add(new Area() { No = m.Groups[1].Value, Address = new List<string>() { m.Groups[2].Value } });
+						break;
+					case 'E':
+						var mc = Regex.Matches(buf, @"E (\d*) (\w*)\(\w*\) (\w*)(, (\w*)){0,}");
+						List<string> ls = new List<string>();
+						ls.Add(mc[0].Groups[2].Captures[0].Value + mc[0].Groups[3].Captures[0].Value);
+						foreach (var tn in mc[0].Groups[5].Captures) {
+							ls.Add(mc[0].Groups[2].Captures[0].Value + (tn as Capture).Value);
+						}
+						AreaData.Add(new Area() { No = mc[0].Groups[1].Value, Address = ls });
+						break;
+					case 'I':
+						var mci = Regex.Matches(buf, @"I (\d*) (\w*)\(\w*\) (\w*)(, (\w*)){0,}");
+						List<string> lsi = new List<string>();
+						lsi.Add(mci[0].Groups[2].Captures[0].Value + mci[0].Groups[3].Captures[0].Value);
+						foreach (var tn in mci[0].Groups[5].Captures) {
+							lsi.Add(mci[0].Groups[2].Captures[0].Value + (tn as Capture).Value);
+						}
+						AreaData.Add(new Area() { No = mci[0].Groups[1].Value, Address = lsi });
+						break;
+					case 'N':
+						var mcn = Regex.Matches(buf, @"N (\d*) (\w*) (\w*)(, (\w*)){0,}");
+						List<string> lsn = new List<string>();
+						lsn.Add(mcn[0].Groups[3].Captures[0].Value);
+						foreach (var ti in mcn[0].Groups[5].Captures) {
+							lsn.Add((ti as Capture).Value);
+						}
+						AreaData.Add(new Area() { No = mcn[0].Groups[1].Value, Address = lsn });
+						break;
+					default: break;
+				}
 			}
 
 			public static List<string> GetFromList(List<string> listAddress, List<Area> listArea) {
@@ -299,6 +303,100 @@ namespace LogProc {
 					}
 				}
 				return res;
+			}
+
+			public static List<Area> GetMixedListFromPref(string[] deletePref, string addDataFileName) {
+				string mixedData = "";
+				bool isHokkaido = false; int hkdCnt = 0;
+
+				System.IO.StreamReader sr = new System.IO.StreamReader("data/Prefectures.area.txt", System.Text.Encoding.Default);
+				if(deletePref.Where(dp => dp == "01").Count() > 0) {
+					isHokkaido = true;
+				}
+				while (sr.Peek() > 0) {
+					string buf = sr.ReadLine();
+					var tmp = buf.Split(' ');
+					if(isHokkaido && hkdCnt++ < 14) {
+						continue;
+					}
+					bool chk = false;
+					foreach(var dp in deletePref) {
+						if(tmp[1] == dp) {
+							chk = true;
+						}
+					}
+					if (!chk) {
+						mixedData += buf + "\r\n";
+					}
+				}
+				sr.Close();
+
+				if (addDataFileName == "__hkd") {
+					mixedData += "A 01 北海道\r\n";
+				} else {
+					sr = new System.IO.StreamReader("data/" + addDataFileName + ".area.txt", System.Text.Encoding.Default);
+					while (sr.Peek() > 0) {
+						string buf = sr.ReadLine();
+						mixedData += buf + "\r\n";
+					}
+				}
+
+				var AreaData = new List<Area>();
+				foreach(var d in mixedData.Split(new string[] { "\r\n", }, System.StringSplitOptions.RemoveEmptyEntries)) {
+					ExecuteFromStr(AreaData, d);
+				}
+				return AreaData;
+			}
+
+			public static List<Area> GetMixedListFromPref(string[] deletePref, string[] addFromACAGPref) {
+				string mixedData = "";
+				bool isHokkaido = false; int hkdCnt = 0;
+
+				System.IO.StreamReader sr = new System.IO.StreamReader("data/Prefectures.area.txt", System.Text.Encoding.Default);
+				if (deletePref.Where(dp => dp == "01").Count() > 0) {
+					isHokkaido = true;
+				}
+				while (sr.Peek() > 0) {
+					string buf = sr.ReadLine();
+					var tmp = buf.Split(' ');
+					if (isHokkaido && hkdCnt++ < 14) {
+						continue;
+					}
+					bool chk = false;
+					foreach (var dp in deletePref) {
+						if (tmp[1] == dp) {
+							chk = true;
+						}
+					}
+					if (!chk) {
+						mixedData += buf + "\r\n";
+					}
+				}
+				sr.Close();
+
+				sr = new System.IO.StreamReader("data/ACAG.area.txt", System.Text.Encoding.Default);
+				while (sr.Peek() > 0) {
+					string buf = sr.ReadLine();
+					var tmp = buf.Split(' ');
+					bool chk = false;
+					foreach (var ap in addFromACAGPref) {
+						if (ap == "__hkd") continue;
+						if (tmp[1].Substring(0, 2) == ap) {
+							chk = true;
+						}
+					}
+					if (!chk) continue;
+					mixedData += buf + "\r\n";
+				}
+				if(addFromACAGPref.Where(fp => fp == "__hkd").Count() > 0) {
+					mixedData += "A 01 北海道\r\n";
+				}
+
+				var AreaData = new List<Area>();
+				foreach (var d in mixedData.Split(new string[] { "\r\n", }, System.StringSplitOptions.RemoveEmptyEntries)) {
+					ExecuteFromStr(AreaData, d);
+				}
+				return AreaData;
 			}
 		}
 		public static class Station {

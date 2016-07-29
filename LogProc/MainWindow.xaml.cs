@@ -20,8 +20,8 @@ namespace LogProc {
 		private ObservableCollection<List<LogData>> Duplicates { get; set; }
 		private List<InterSet> Intersets { get; set; }
 		private InterSet nowItst { get; set; }
-		private string Version { get { return "0.8.61"; } }
-		private string BuildTime { get { return "20160703"; } }
+		private string Version { get { return "0.8.62"; } }
+		private string BuildTime { get { return "20160729"; } }
 
 		public MainWindow() {
 			try {
@@ -62,7 +62,9 @@ namespace LogProc {
 		private void SetInterset() {
 			Intersets = new List<InterSet>();
 			Intersets.Add(ALLJA.Property.Intersets);
+			Intersets.Add(Tokyo.Property.Intersets);
 			Intersets.Add(AllKanagawa.Property.Intersets);
+			Intersets.Add(Yamanashi.Property.Intersets);
 			Intersets.Add(SixMAndDown.Property.Intersets);
 			Intersets.Add(FieldDay.Property.Intersets);
 			Intersets.Add(NTTCwPh.Property.Intersets);
@@ -170,8 +172,12 @@ namespace LogProc {
 			ofd.Title = "作業ファイルの読み込み";
 			ofd.Filter = "作業ファイル(*.work.xml)|*.work.xml";
 			if(ofd.ShowDialog() != true) return;
+			LoadWork(ofd.FileName);
+		}
+
+		private void LoadWork(string filename) {
 			DataContractSerializer serial = new DataContractSerializer(typeof(WorkingData));
-			XmlReader xr = XmlReader.Create(ofd.FileName);
+			XmlReader xr = XmlReader.Create(filename);
 			Work = new WorkingData();
 			Work = (WorkingData)serial.ReadObject(xr);
 			ConfTab.DoLoad(Work.Config);
@@ -404,6 +410,8 @@ namespace LogProc {
 						}
 
 						UpdateData();
+					} else if(f.Substring(f.Length - 8) == "work.xml") {
+						LoadWork(f);
 					}
 				}
 			}
