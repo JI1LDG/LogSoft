@@ -4,6 +4,7 @@ using Microsoft.Win32;
 using LogProc.Definitions;
 using LogProc.Interfaces;
 using System.Text;
+using System.Linq;
 
 namespace LogProc {
 	/// <summary>

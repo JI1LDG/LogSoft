@@ -11,19 +11,32 @@ namespace LogProc {
 			public const string SettingVer = "0.8.53";
 			public static string[][] PrefList() {
 				string[][] tmp = new string[][] {
-				new string[] {"長野", "新潟"},
-				new string[] {"東京", "神奈川", "千葉", "埼玉", "群馬", "栃木", "茨城", "山梨"},
-				new string[] {"愛知", "静岡", "岐阜", "三重"},
-				new string[] {"大阪", "兵庫", "京都", "奈良", "滋賀", "和歌山"},
-				new string[] {"岡山", "広島", "山口", "鳥取", "島根"},
-				new string[] {"香川", "愛媛", "高知", "徳島"},
-				new string[] {"福岡", "佐賀", "長崎", "熊本", "大分", "宮崎", "鹿児島", "沖縄"},
-				new string[] {"宮城", "福島", "岩手", "青森", "秋田", "山形"},
-				new string[] {"北海道"},
-				new string[] {"石川", "福井", "富山"}
+				new string[] {"長野県", "新潟県"},
+				new string[] {"東京都", "神奈川県", "千葉県", "埼玉県", "群馬県", "栃木県", "茨城県", "山梨県"},
+				new string[] { "愛知県", "静岡県", "岐阜県", "三重県"},
+				new string[] { "大阪府", "兵庫県", "京都府", "奈良県", "滋賀県", "和歌山県"},
+				new string[] { "岡山県", "広島県", "山口県", "鳥取県", "島根県"},
+				new string[] { "香川県", "愛媛県", "高知県", "徳島県"},
+				new string[] { "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"},
+				new string[] { "宮城県", "福島県", "岩手県", "青森県", "秋田県", "山形県"},
+				new string[] { "北海道" },
+				new string[] { "石川県", "福井県", "富山県" }
 				};
 			return tmp;
 				}
+
+			public static int GetAreano(string pref) {
+				var prefs = PrefList();
+				for(int i = 0;i < 10; i++) {
+					foreach (var p in prefs[i]) {
+						if (pref.Contains(p)) {
+							return i;
+						}
+					}
+				}
+
+				return -1;
+			}
 		}
 
 		public enum ModeStr {

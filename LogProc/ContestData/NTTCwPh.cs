@@ -2,6 +2,8 @@
 using LogProc.Definitions;
 using LogProc.Interfaces;
 using LogProc.Utilities;
+using System.Linq;
+
 namespace LogProc {
 	namespace NTTCwPh {
 		public class Property {
@@ -111,14 +113,7 @@ namespace LogProc {
 			public StationData station { get; set; }
 			public Setting config { get; set; }
 			public string anvStr { get; set; }
-			public bool isErrorAvailable {
-				get {
-					foreach(var e in listErr.Values) {
-						if (e.IsSet) return true;
-					}
-					return false;
-				}
-			}
+			public bool isErrorAvailable { get { return listErr.Any(x => x.Value.IsSet); } }
 
 			private bool isNTT { get { return config.CategoryCode[0] == 'G' ? false : true; } }
 
@@ -196,15 +191,8 @@ namespace LogProc {
 							ErrorReason.Set(listErr, Reason.ReceivedCnUnexists.ToString(), Utils.ConvTostrarrFromList(Areano.GetFromList(Station.GetList(station), listMainArea)));
 							break;
 					}
-				} else {
-					bool regchk = false;
-					foreach(var pr in phoneRegion) {
-						if(pr == Callsign.GetRegion(log.Callsign, hasStroke)) {
-							regchk = true;
-							break;
-						}
-					}
-					if (!regchk) {
+				} else {					
+					if (!phoneRegion.Any(x => x == Callsign.GetRegion(log.Callsign, hasStroke))) {
 						ErrorReason.Set(listErr, Reason.RegionUnmatches.ToString());
 					}
 					if (!Station.IsMatched(areano, stationAreano) && station != null && !hasStroke) {

@@ -21,10 +21,10 @@
 			<Label/>
 		</DockPanel>
 		<Label DockPanel.Dock="Top" Content="周波数ごとのコンテストナンバ設定"/>
-		<DataGrid Name="dgRcn" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" CanUserAddRows="False" Height="Auto" MinHeight="50">
+		<DataGrid Name="dgRcn" AutoGenerateColumns="False" VerticalScrollBarVisibility="Auto" CanUserAddRows="False" Height="Auto" MinHeight="50" ItemsSource="{Binding scn, UpdateSourceTrigger=PropertyChanged}">
 			<DataGrid.Columns>
-				<DataGridTextColumn Binding="{Binding Frequency}" Header="周波数"/>
-				<DataGridTextColumn Binding="{Binding Scn}" Header="コンテストナンバ"/>
+				<DataGridTextColumn Binding="{Binding Freq}" Header="周波数"/>
+				<DataGridTextColumn Binding="{Binding SentCn}" Header="コンテストナンバ"/>
 			</DataGrid.Columns>
 		</DataGrid>
 	</DockPanel>

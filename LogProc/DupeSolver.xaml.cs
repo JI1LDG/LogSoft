@@ -22,7 +22,7 @@ namespace LogProc {
 		public ObservableCollection<LogData> Log { get; set; }
 		private ObservableCollection<List<LogData>> Duplis { get; set; }
 		private List<LogData> Delete { get; set; }
-		private ObservableCollection<LogData> Shown { get; set; }
+		private List<LogData> Shown { get; set; }
 		private int nowCount;
 
 		public DupeSolver(ObservableCollection<LogData> log, ObservableCollection<List<LogData>> dupe) {
@@ -70,12 +70,9 @@ namespace LogProc {
 
 		private void Tryon(int count) {
 			nowCount = count;
-			Shown = new ObservableCollection<LogData>();
-			for(int i = 0;i < Duplis[count].Count; i++) { 
-				if(!Delete.Exists(x => x == Duplis[count][i])) {
-					Shown.Add(Duplis[count][i]);
-				}
-			}
+			Shown = new List<LogData>();
+
+			Shown.AddRange(Duplis[count].Where(x => !Delete.Exists(y => y == x)));
 			dgLog.ItemsSource = Shown;
 		}
 
@@ -106,7 +103,7 @@ namespace LogProc {
 			var tmp = (LogData)dgLog.SelectedItem;
 			Shown.Remove(tmp);
 			Delete.Add(tmp);
-			dgLog.ItemsSource = Shown;
+			dgLog.ItemsSource = new ObservableCollection<LogData>(Shown);
 		}
 	}
 }

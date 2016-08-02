@@ -108,27 +108,11 @@ namespace LogProc {
 			}
 
 			public static List<string> GetPhoneRegion(string areano, List<Area> listArea) {
-				var tmp = new int[10];
-				foreach(var la in listArea) {
-					if(la.No == areano) {
-						foreach(var ladd in la.Address) {
-							for(int i = 0;i < 10; i++) {
-								if (tmp[i] > 0) continue;
-								foreach(var p in defs.PrefList()[i]) {
-									if (ladd.Contains(p)) {
-										tmp[i]++;
-										break;
-									}
-								}
-							}
-						}
-					}
-				}
-				var ret = new List<string>();
-				for(int j = 0;j < 10; j++) {
-					if (tmp[j] > 0) ret.Add(j.ToString());
-				}
-				if (ret.Count > 0) return ret;
+				var prefList = defs.PrefList();
+
+				var laAddr = listArea.Where(x => x.No == areano).First().Address.Select(x => defs.GetAreano(x)).Where(x => 0 <= x && x <= 9).Distinct().Select(x => x.ToString()).ToList();
+
+				if (laAddr.Count > 0) return laAddr;
 				return null;
 			}
 
@@ -218,12 +202,7 @@ namespace LogProc {
 		}
 		public static class Areano {
 			public static bool IsBeen(List<Area> listArea, string areano) {
-				foreach(var a in listArea) {
-					if(a.No == areano) {
-						return true;
-					}
-				}
-				return false;
+				return listArea.Any(x => x.No == areano);
 			}
 
 			public static List<Area> GetList(string areaFileName) {
@@ -247,27 +226,21 @@ namespace LogProc {
 						var mc = Regex.Matches(buf, @"E (\d*) (\w*)\(\w*\) (\w*)(, (\w*)){0,}");
 						List<string> ls = new List<string>();
 						ls.Add(mc[0].Groups[2].Captures[0].Value + mc[0].Groups[3].Captures[0].Value);
-						foreach (var tn in mc[0].Groups[5].Captures) {
-							ls.Add(mc[0].Groups[2].Captures[0].Value + (tn as Capture).Value);
-						}
+						ls.AddRange(mc[0].Groups[5].Captures.Cast<Capture>().Select(x => mc[0].Groups[2].Captures[0].Value + (x as Capture).Value));
 						AreaData.Add(new Area() { No = mc[0].Groups[1].Value, Address = ls });
 						break;
 					case 'I':
 						var mci = Regex.Matches(buf, @"I (\d*) (\w*)\(\w*\) (\w*)(, (\w*)){0,}");
 						List<string> lsi = new List<string>();
 						lsi.Add(mci[0].Groups[2].Captures[0].Value + mci[0].Groups[3].Captures[0].Value);
-						foreach (var tn in mci[0].Groups[5].Captures) {
-							lsi.Add(mci[0].Groups[2].Captures[0].Value + (tn as Capture).Value);
-						}
+						lsi.AddRange(mci[0].Groups[5].Captures.Cast<Capture>().Select(x => mci[0].Groups[2].Captures[0].Value + (x as Capture).Value));
 						AreaData.Add(new Area() { No = mci[0].Groups[1].Value, Address = lsi });
 						break;
 					case 'N':
 						var mcn = Regex.Matches(buf, @"N (\d*) (\w*) (\w*)(, (\w*)){0,}");
 						List<string> lsn = new List<string>();
 						lsn.Add(mcn[0].Groups[3].Captures[0].Value);
-						foreach (var ti in mcn[0].Groups[5].Captures) {
-							lsn.Add((ti as Capture).Value);
-						}
+						lsn.AddRange(mcn[0].Groups[5].Captures.Cast<Capture>().Select(x => (x as Capture).Value));
 						AreaData.Add(new Area() { No = mcn[0].Groups[1].Value, Address = lsn });
 						break;
 					default: break;
@@ -277,15 +250,10 @@ namespace LogProc {
 			public static List<string> GetFromList(List<string> listAddress, List<Area> listArea) {
 				if (listAddress == null) return null;
 				var tmp = new List<string>();
-				foreach (var al in listAddress) {
-					foreach (var ad in listArea) {
-						foreach (var a in ad.Address) {
-							if (al.Contains(a)) {
-								tmp.Add(al + "(" + ad.No + ")");
-							}
-						}
-					}
-				}
+
+				listAddress.ForEach(al => {
+					tmp.AddRange(listArea.SelectMany(x => x.Address, (x, addr) => new { No = x.No, Address = addr }).Where(x => al.Contains(x.Address)).Select(x => al + "(" + x.No + ")").Distinct().ToList());
+				});
 				return tmp;
 			}
 
@@ -293,15 +261,9 @@ namespace LogProc {
 				var gsal = Station.GetList(station);
 				if (gsal == null) return null;
 				var res = new List<string>();
-				foreach(var st in gsal) {
-					foreach(var ad in listArea) {
-						foreach(var ar in ad.Address) {
-							if(st.Contains(ar) == true) {
-								res.Add(ad.No); //ato de chofuku jokyo
-							}
-						}
-					}
-				}
+				gsal.ForEach(st => {
+					res.AddRange(listArea.SelectMany(x => x.Address, (x, addr) => new { No = x.No, Address = addr }).Where(x => st.Contains(x.Address)).Select(x => x.No).Distinct().ToList());
+				});
 				return res;
 			}
 
@@ -310,22 +272,17 @@ namespace LogProc {
 				bool isHokkaido = false; int hkdCnt = 0;
 
 				System.IO.StreamReader sr = new System.IO.StreamReader("data/Prefectures.area.txt", System.Text.Encoding.Default);
-				if(deletePref.Where(dp => dp == "01").Count() > 0) {
+				if(deletePref.Any(dp => dp == "01")) {
 					isHokkaido = true;
 				}
 				while (sr.Peek() > 0) {
 					string buf = sr.ReadLine();
-					var tmp = buf.Split(' ');
+					var tmp = buf.Split(' ')[1];
 					if(isHokkaido && hkdCnt++ < 14) {
 						continue;
 					}
-					bool chk = false;
-					foreach(var dp in deletePref) {
-						if(tmp[1] == dp) {
-							chk = true;
-						}
-					}
-					if (!chk) {
+
+					if (!deletePref.Any(x => x == tmp)) {
 						mixedData += buf + "\r\n";
 					}
 				}
@@ -353,22 +310,16 @@ namespace LogProc {
 				bool isHokkaido = false; int hkdCnt = 0;
 
 				System.IO.StreamReader sr = new System.IO.StreamReader("data/Prefectures.area.txt", System.Text.Encoding.Default);
-				if (deletePref.Where(dp => dp == "01").Count() > 0) {
+				if (deletePref.Any(dp => dp == "01")) {
 					isHokkaido = true;
 				}
 				while (sr.Peek() > 0) {
 					string buf = sr.ReadLine();
-					var tmp = buf.Split(' ');
+					var tmp = buf.Split(' ')[1];
 					if (isHokkaido && hkdCnt++ < 14) {
 						continue;
 					}
-					bool chk = false;
-					foreach (var dp in deletePref) {
-						if (tmp[1] == dp) {
-							chk = true;
-						}
-					}
-					if (!chk) {
+					if (!deletePref.Any(x => x == tmp)) {
 						mixedData += buf + "\r\n";
 					}
 				}
@@ -377,18 +328,12 @@ namespace LogProc {
 				sr = new System.IO.StreamReader("data/ACAG.area.txt", System.Text.Encoding.Default);
 				while (sr.Peek() > 0) {
 					string buf = sr.ReadLine();
-					var tmp = buf.Split(' ');
-					bool chk = false;
-					foreach (var ap in addFromACAGPref) {
-						if (ap == "__hkd") continue;
-						if (tmp[1].Substring(0, 2) == ap) {
-							chk = true;
-						}
-					}
-					if (!chk) continue;
+					var tmp = buf.Split(' ')[1];
+
+					if (!addFromACAGPref.Any(x => tmp.Substring(0, 2) == x)) continue;
 					mixedData += buf + "\r\n";
 				}
-				if(addFromACAGPref.Where(fp => fp == "__hkd").Count() > 0) {
+				if(addFromACAGPref.Any(fp => fp == "__hkd")) {
 					mixedData += "A 01 北海道\r\n";
 				}
 
@@ -409,40 +354,22 @@ namespace LogProc {
 
 			public static bool IsMatched(string areano, List<string> listAreano) {
 				if (listAreano == null) return false;
-				foreach (var sa in listAreano) {
-					if (areano == sa) {
-						return true;
-					}
-				}
-				return false;
+
+				return listAreano.Any(x => x == areano);
 			}
 		}
 		public static class Utils {
 			public static string ConvTostrarrFromList(List<string> listStr) {
 				if (listStr == null) return "";
-				return string.Join(", ", listStr.Distinct<string>().ToArray());
+				return string.Join(",", listStr.Distinct<string>().ToArray());
 			}			
 
 			public static string GetOpList(WorkingData workData) {
 				if(!workData.Config.IsAutoOperatorEditEnabled) {
 					return workData.Config.Operator;
 				}
-				List<string> op = new List<string>();
-				foreach(var l in workData.Log) {
-					bool avail = false;
-					foreach(var o in op) {
-						if(o == l.Operator) {
-							avail = true;
-							break;
-						}
-					}
-					if(avail) continue;
-					//空白無視
-					if(l.Operator == "") continue;
-					op.Add(l.Operator);
-				}
-				op.Sort();
-				return string.Join(", ", op.ToArray());
+				var op = workData.Log.Select(x => x.Operator).Where(x => x != "").Distinct().OrderBy(x => x).ToArray();
+				return string.Join(",", op);
 			}
 		}
 	}

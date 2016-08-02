@@ -308,13 +308,8 @@ namespace LogProc {
 		}
 
 		private void SetNowIntersets() {
-			for(int i = 0;i < Intersets.Count;i++) {
-				if(Intersets[i].Def.contestName == Work.Config.ContestName) {
-					//Setting load cancel de ochiru
-					nowItst = Intersets[i];
-					return;
-				}
-			}
+			var ret = Intersets.Where(x => x.Def.contestName == Work.Config.ContestName).FirstOrDefault();
+			if (ret != null) nowItst = ret;
 		}
 
 		private void btLoadSetting_Click(object sender, RoutedEventArgs e) {

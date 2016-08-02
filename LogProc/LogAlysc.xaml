@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         Title="ログ解析" Height="300" Width="400">
 	<DockPanel>
-		<DataGrid Grid.Row="0" Name="dgAlysc" AutoGenerateColumns="False" IsReadOnly="True">
+		<DataGrid Grid.Row="0" Name="dgAlysc" AutoGenerateColumns="False" IsReadOnly="True"  ItemsSource="{Binding alydata, UpdateSourceTrigger=PropertyChanged}">
 			<DataGrid.Columns>
 				<DataGridTextColumn Header="名前" Binding="{Binding Name}"/>
 				<DataGridTextColumn Header="件数" Binding="{Binding Num}"/>

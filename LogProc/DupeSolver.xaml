@@ -14,12 +14,12 @@
 		</Grid.RowDefinitions>
 		<StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right">
 			<Button Name="btMinus" Click="btMinus_Click"/>
-			<TextBox Name="tbCount" PreviewTextInput="tbCount_PreviewTextInput" Text="0"/>
+			<TextBox Name="tbCount" PreviewTextInput="tbCount_PreviewTextInput" Text="1"/>
 			<Button Name="btPlus" Click="btPlus_Click"/>
 			<Separator/>
 			<Button Name="btTryon" Content="移動" Click="btTryon_Click"/>
 		</StackPanel>
-		<DataGrid Grid.Row="1" Name="dgLog" AutoGenerateColumns="False" ItemsSource="{Binding Log, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Language="ja-JP" CanUserDeleteRows="False" CanUserAddRows="False">
+		<DataGrid Grid.Row="1" Name="dgLog" AutoGenerateColumns="False" ItemsSource="{Binding Log, UpdateSourceTrigger=PropertyChanged}" Language="ja-JP" CanUserDeleteRows="False" CanUserAddRows="False">
 			<DataGrid.Columns>
 				<DataGridTextColumn Header="日時" Binding="{Binding Date, StringFormat=g}"/>
 				<DataGridTextColumn Header="コールサイン" Binding="{Binding Callsign}"/>

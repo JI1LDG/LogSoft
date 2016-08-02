@@ -48,6 +48,7 @@ namespace LogProc {
 					tmp = tmp.Substring(0, i);
 				}
 			}
+
 			if(tmp.Length > 1) {
 				if(0x52 == tmp[0]) return tmp;
 				if(0x20 <= tmp[0] && tmp[0] <= 0x7e) {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Collections.ObjectModel;
+using System.Linq;
 using LogProc.Definitions;
 using LogProc.Interfaces;
 using LogProc.Utilities;
@@ -76,27 +77,21 @@ namespace LogProc {
 						var mc = Regex.Matches(buf, @"E (\d*) (\w*)\(\w*\) (\w*)(, (\w*)){0,}");
 						List<string> ls = new List<string>();
 						ls.Add(mc[0].Groups[2].Captures[0].Value + mc[0].Groups[3].Captures[0].Value);
-						foreach(var tn in mc[0].Groups[5].Captures) {
-							ls.Add(mc[0].Groups[2].Captures[0].Value + (tn as Capture).Value);
-						}
+						ls.AddRange(mc[0].Groups[5].Captures.Cast<Capture>().Select(x => mc[0].Groups[2].Captures[0].Value + (x as Capture).Value));
 						AreaData.Add(new Area() { No = mc[0].Groups[1].Value, Address = ls });
 						break;
 					case 'I':
 						var mci = Regex.Matches(buf, @"I (\d*) (\w*)\(\w*\) (\w*)(, (\w*)){0,}");
 						List<string> lsi = new List<string>();
 						lsi.Add(mci[0].Groups[2].Captures[0].Value + mci[0].Groups[3].Captures[0].Value);
-						foreach(var tn in mci[0].Groups[5].Captures) {
-							lsi.Add(mci[0].Groups[2].Captures[0].Value + (tn as Capture).Value);
-						}
+						lsi.AddRange(mci[0].Groups[5].Captures.Cast<Capture>().Select(x => mci[0].Groups[2].Captures[0].Value + (x as Capture).Value));
 						AreaData.Add(new Area() { No = mci[0].Groups[1].Value, Address = lsi });
 						break;
 					case 'N':
 						var mcn = Regex.Matches(buf, @"N (\d*) (\w*) (\w*)(, (\w*)){0,}");
 						List<string> lsn = new List<string>();
 						lsn.Add(mcn[0].Groups[3].Captures[0].Value);
-						foreach(var ti in mcn[0].Groups[5].Captures) {
-							lsn.Add((ti as Capture).Value);
-						}
+						lsn.AddRange(mcn[0].Groups[5].Captures.Cast<Capture>().Select(x => (x as Capture).Value));
 						AreaData.Add(new Area() { No = mcn[0].Groups[1].Value, Address = lsn });
 						break;
 					default: break;

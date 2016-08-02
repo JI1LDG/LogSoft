@@ -14,7 +14,7 @@ namespace LogProc {
 	/// Equip.xaml の相互作用ロジック
 	/// </summary>
 	public partial class Equip : Window {
-		private ObservableCollection<EquipGrid> gEquip { get; set; }
+		private List<EquipGrid> gEquip { get; set; }
 		private List<EquipData> eqp;
 		public string EquipStr { get { return tbPreview.Text; } }
 		public bool isChanged { get; set; }
@@ -28,7 +28,7 @@ namespace LogProc {
 
 		private void Update() {
 			//gEquip = new ObservableCollection<EquipGrid>(gEquip.OrderByDescending(l => l.Data.Category).ThenBy(m => m.Data.Name).ThenBy(n => n.Data.Rem));
-			gEquip = new ObservableCollection<EquipGrid>(gEquip.OrderByDescending(l => l.Data.Category).ThenBy(m => m.Data.Rem).ThenBy(n => n.Data.Name));
+			gEquip = new List<EquipGrid>(gEquip.OrderByDescending(l => l.Data.Category).ThenBy(m => m.Data.Rem).ThenBy(n => n.Data.Name));
 			dgEquip.ItemsSource = gEquip;
 		}
 
@@ -51,7 +51,7 @@ namespace LogProc {
 		}
 
 		private void DoLoad() {
-			gEquip = new ObservableCollection<EquipGrid>();
+			gEquip = new List<EquipGrid>();
 			eqp = new List<EquipData>();
 			try {
 				using(var str = new StreamReader(@"data/Equipments.xml")) {
@@ -88,9 +88,8 @@ namespace LogProc {
 				System.Console.WriteLine(e.Message);
 				return;
 			}
-			foreach(var data in eqp) {
-				gEquip.Add(new EquipGrid() { IsEquiped = false, Data = data, });
-			}
+
+			gEquip.AddRange(eqp.Select(x => new EquipGrid() { IsEquiped = false, Data = x }));
 		}
 
 		private void btClose_Click(object sender, RoutedEventArgs e) {
@@ -134,18 +133,13 @@ namespace LogProc {
 		private void CheckBox_Click(object sender, RoutedEventArgs e) {
 			//Update();
 			List<EquipNum> len = new List<EquipNum>();
-			bool ok;
 			foreach(var eq in gEquip) {
 				if(!eq.IsEquiped) continue;
-				ok = false;
-				foreach(var l in len) {
-					if(l.Name == eq.Data.Name) {
-						l.Num++;
-						ok = true;
-						break;
-					}
+				var data = len.FirstOrDefault(x => x.Name == eq.Data.Name);
+				if (data != null) {
+					data.Num++;
+					continue;
 				}
-				if(ok) continue;
 				len.Add(new EquipNum() {
 					Name = eq.Data.Name,
 					Num = 1,

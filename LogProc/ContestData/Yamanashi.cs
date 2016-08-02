@@ -2,6 +2,7 @@
 using LogProc.Definitions;
 using LogProc.Interfaces;
 using LogProc.Utilities;
+using System.Linq;
 
 namespace LogProc {
 	namespace Yamanashi {
@@ -80,16 +81,8 @@ namespace LogProc {
 			public StationData station { get; set; }
 			public Setting config { get; set; }
 			public string anvStr { get; set; }
-			public bool isErrorAvailable {
-				get {
-					foreach (var e in listErr.Values) {
-						if (e.IsSet) return true;
-					}
-					return false;
-				}
-			}
-
 			private Dictionary<string, ErrorReason> listErr;
+			public bool isErrorAvailable { get { return listErr.Any(x => x.Value.IsSet); } }
 
 			public void check() {
 				listErr = ErrorReason.GetInitial();
