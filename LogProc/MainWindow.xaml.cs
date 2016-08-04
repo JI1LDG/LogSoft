@@ -20,8 +20,9 @@ namespace LogProc {
 		private ObservableCollection<List<LogData>> Duplicates { get; set; }
 		private List<InterSet> Intersets { get; set; }
 		private InterSet nowItst { get; set; }
-		private string Version { get { return "0.8.62"; } }
-		private string BuildTime { get { return "20160729"; } }
+
+		private string Version { get { return "0.8.63"; } }
+		private string BuildTime { get { return "20160804"; } }
 
 		public MainWindow() {
 			try {
