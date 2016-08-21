@@ -21,8 +21,8 @@ namespace LogProc {
 		private List<InterSet>[] Intersets { get; set; }
 		private InterSet[] nowItst { get; set; }
 
-		private string Version { get { return "0.8.63"; } }
-		private string BuildTime { get { return "20160804"; } }
+		private string Version { get { return "0.8.64"; } }
+		private string BuildTime { get { return "20160821"; } }
 
 		public MainWindow() {
 			try {
@@ -48,47 +48,6 @@ namespace LogProc {
 			foreach(var i in Intersets[0]) defPlugins.Add(i.Def);
 			ConfTab.Plugins = defPlugins.ToArray();
 			dgLog.ItemsSource = Work.Log;
-
-			if(CheckDBColumns() == 3) {
-				using(var connect = new SQLiteConnection("Data Source=data/RadioStation.db")) {
-					connect.Open();
-					using(SQLiteTransaction sqlt = connect.BeginTransaction()) {
-						using(SQLiteCommand command = connect.CreateCommand()) {
-							command.CommandText = "alster table Stations add column";
-							command.ExecuteNonQuery();
-						}
-						sqlt.Commit();
-					}
-					connect.Close();
-				}
-			}
-		}
-
-		private int CheckDBColumns() {
-			if(!System.IO.File.Exists("data/RadioStation.db")) {
-				CreateDB();
-				return 4;
-			}
-
-			int columns = -1;
-			using(var con = new SQLiteConnection()) {
-				con.ConnectionString = "Data Source=data/RadioStation.db;";
-				con.Open();
-				using(SQLiteCommand com = con.CreateCommand()) {
-					com.CommandText = "select * from Stations";
-					using(var reader = com.ExecuteReader()) {
-						if(!reader.HasRows) {
-							con.Close();
-						} else {
-							reader.Read();
-							columns = reader.FieldCount;
-						}
-					}
-				}
-				con.Close();
-			}
-
-			return columns;
 		}
 
 		private void WarnRule() {

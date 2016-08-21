@@ -1,4 +1,4 @@
-﻿ログ集計支援ソフト Ver:0.8.63(rev:36, Build:20160804)
+﻿ログ集計支援ソフト Ver:0.8.64(rev:37, Build:20160821)
 This software is released under the MIT License, see LICENSE.txt.
 
 ******** 注意 ********
@@ -61,6 +61,10 @@ URL: https://htmlagilitypack.codeplex.com/
 
 
 ・更新履歴
+Rev:37(0.8.64) 2016/08/21
+マルチスレッド(2)対応
+エリアナンバとコンテストナンバの検出不正を修正
+
 Rev:36(0.8.63) 2016/08/04
 DataGrid周りの不具合修正
 LINQで一部書き直し
