@@ -18,8 +18,8 @@ namespace LogProc {
 	public partial class MainWindow : Window {
 		private WorkingData Work { get; set; }
 		private ObservableCollection<List<LogData>> Duplicates { get; set; }
-		private List<InterSet> Intersets { get; set; }
-		private InterSet nowItst { get; set; }
+		private List<InterSet>[] Intersets { get; set; }
+		private InterSet[] nowItst { get; set; }
 
 		private string Version { get { return "0.8.63"; } }
 		private string BuildTime { get { return "20160804"; } }
@@ -45,7 +45,7 @@ namespace LogProc {
 			this.Title += "(Ver: " + Version + ")";
 			SetInterset();
 			List<IDefine> defPlugins = new List<IDefine>();
-			foreach(var i in Intersets) defPlugins.Add(i.Def);
+			foreach(var i in Intersets[0]) defPlugins.Add(i.Def);
 			ConfTab.Plugins = defPlugins.ToArray();
 			dgLog.ItemsSource = Work.Log;
 		}
@@ -61,16 +61,20 @@ namespace LogProc {
 		}
 
 		private void SetInterset() {
-			Intersets = new List<InterSet>();
-			Intersets.Add(ALLJA.Property.Intersets);
-			Intersets.Add(Tokyo.Property.Intersets);
-			Intersets.Add(AllKanagawa.Property.Intersets);
-			Intersets.Add(Yamanashi.Property.Intersets);
-			Intersets.Add(SixMAndDown.Property.Intersets);
-			Intersets.Add(FieldDay.Property.Intersets);
-			Intersets.Add(NTTCwPh.Property.Intersets);
-			Intersets.Add(ACAG.Property.Intersets);
-			Intersets.Add(KantoUHF.Property.Intersets);
+			Intersets = new List<InterSet>[2];
+			for(int i = 0;i < Intersets.Length; i++) {
+				Intersets[i] = new List<InterSet>();
+				Intersets[i].Add(ALLJA.Property.Intersets);
+				Intersets[i].Add(Tokyo.Property.Intersets);
+				Intersets[i].Add(AllKanagawa.Property.Intersets);
+				Intersets[i].Add(Yamanashi.Property.Intersets);
+				Intersets[i].Add(SixMAndDown.Property.Intersets);
+				Intersets[i].Add(FieldDay.Property.Intersets);
+				Intersets[i].Add(NTTCwPh.Property.Intersets);
+				Intersets[i].Add(ACAG.Property.Intersets);
+				Intersets[i].Add(KantoUHF.Property.Intersets);
+			}
+			nowItst = new InterSet[Intersets.Length];
 		}
 
 		private void UpdateData() {
@@ -146,11 +150,11 @@ namespace LogProc {
 			Work.Config = ConfTab.GetSetting();
 			SetNowIntersets();
 			UpdateData();
-			if (nowItst == null) {
+			if (nowItst[0] == null) {
 				MessageBox.Show("コンテスト情報を設定してください。", "通知");
 				return;
 			}
-			var ol = new OutputLog(Work, nowItst.Sum);
+			var ol = new OutputLog(Work, nowItst[0].Sum);
 			ol.CreateLog(false, false);
 			string output = ol.opLog;
 			if (output == null) {
@@ -295,11 +299,11 @@ namespace LogProc {
 			Work.Config = ConfTab.GetSetting();
 			SetNowIntersets();
 			UpdateData();
-			if (nowItst == null || eventlogdata == null || Work.Log.Count == 0) {
+			if (nowItst[0] == null || eventlogdata == null || Work.Log.Count == 0) {
 				MessageBox.Show("チェックするログがない、もしくは局情報等が設定されてません。", "通知");
 				return;
 			}
-			SearchWindow sw = new SearchWindow(new WorkingData() { Config = ConfTab.GetSetting(), Log = eventlogdata }, nowItst.Sea);
+			SearchWindow sw = new SearchWindow(new WorkingData() { Config = ConfTab.GetSetting(), Log = eventlogdata }, nowItst);
 			sw.ShowDialog();
 			UpdateData();
 		}
@@ -309,8 +313,10 @@ namespace LogProc {
 		}
 
 		private void SetNowIntersets() {
-			var ret = Intersets.Where(x => x.Def.contestName == Work.Config.ContestName).FirstOrDefault();
-			if (ret != null) nowItst = ret;
+			for(int i = 0; i < Intersets.Length; i++) {
+				var ret = Intersets[i].Where(x => x.Def.contestName == Work.Config.ContestName).FirstOrDefault();
+				if(ret != null) nowItst[i] = ret;
+			}
 		}
 
 		private void btLoadSetting_Click(object sender, RoutedEventArgs e) {
@@ -331,11 +337,11 @@ namespace LogProc {
 			Work.Config = ConfTab.GetSetting();
 			SetNowIntersets();
 			UpdateData();
-			if(nowItst == null || Work.Log == null || Work.Log.Count == 0) {
+			if(nowItst[0] == null || Work.Log == null || Work.Log.Count == 0) {
 				MessageBox.Show("チェックするログがない、もしくは局情報等が設定されてません。", "通知");
 				return;
 			}
-			SearchWindow sw = new SearchWindow(Work, nowItst.Sea);
+			SearchWindow sw = new SearchWindow(Work, nowItst);
 			sw.ShowDialog();
 			UpdateData();
 			if(ConfTab.cbAutoOperator.IsChecked == true) {
@@ -348,13 +354,13 @@ namespace LogProc {
 			Work.Config = ConfTab.GetSetting();
 			SetNowIntersets();
 			UpdateData();
-			if (nowItst == null || Work.Log == null || Work.Log.Count == 0) {
+			if (nowItst[0] == null || Work.Log == null || Work.Log.Count == 0) {
 				MessageBox.Show("チェックするログがない、もしくは局情報等が設定されてません。", "通知");
 				return;
 			}
 			
 			OutputSummery os = new OutputSummery(new WorkingData() { Config = ConfTab.GetSetting(), Log = new ObservableCollection<LogData>(Work.Log.OrderBy(l => l.Date))
-		}, nowItst.Sum);
+		}, nowItst);
 			os.ShowDialog();
 			UpdateData();
 		}

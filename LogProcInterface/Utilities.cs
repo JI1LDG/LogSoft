@@ -190,8 +190,12 @@ namespace LogProc {
 			public static List<string> GetPhoneRegion(string areano, List<Area> listArea) {
 				var prefList = defs.PrefList();
 
-				var laAddr = listArea.Where(x => x.No == areano).First().Address.Select(x => defs.GetAreano(x)).Where(x => 0 <= x && x <= 9).Distinct().Select(x => x.ToString()).ToList();
-
+				List<string> laAddr;
+				try {
+					laAddr = listArea.Where(x => x.No == areano).First().Address.Select(x => defs.GetAreano(x)).Where(x => 0 <= x && x <= 9).Distinct().Select(x => x.ToString()).ToList();
+				} catch {
+					return null;
+				}
 				if (laAddr.Count > 0) return laAddr;
 				return null;
 			}
@@ -382,10 +386,26 @@ namespace LogProc {
 			/// </summary>
 			/// <param name="station">無線局情報</param>
 			/// <param name="listArea">エリアリスト</param>
-			/// <returns>住所(エリアナンバ)</returns>
-			public static List<string> GetFromStation(StationData station, List<Area> listArea) {
+			/// <returns>エリアナンバのリスト</returns>
+			public static List<string> GetNoFromStation(StationData station, List<Area> listArea) {
 				var gsal = Station.GetList(station);
 				if (gsal == null) return null;
+				var res = new List<string>();
+				gsal.ForEach(st => {
+					res.AddRange(listArea.SelectMany(x => x.Address, (x, addr) => new { No = x.No, Address = addr }).Where(x => st.Contains(x.Address)).Select(x => x.No).Distinct().ToList());
+				});
+				return res;
+			}
+
+			/// <summary>
+			/// 無線局情報に相当するエリアナンバと住所を抽出
+			/// </summary>
+			/// <param name="station">無線局情報</param>
+			/// <param name="listArea">エリアリスト</param>
+			/// <returns>住所(エリアナンバ)</returns>
+			public static List<string> GetSuggestFromStation(StationData station, List<Area> listArea) {
+				var gsal = Station.GetList(station);
+				if(gsal == null) return null;
 				var res = new List<string>();
 				gsal.ForEach(st => {
 					res.AddRange(listArea.SelectMany(x => x.Address, (x, addr) => new { No = x.No, Address = addr }).Where(x => st.Contains(x.Address)).Select(x => st + "(" + x.No + ")").Distinct().ToList());

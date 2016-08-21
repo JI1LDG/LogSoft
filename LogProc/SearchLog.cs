@@ -12,7 +12,7 @@ namespace LogProc {
 		public ObservableCollection<LogData> Log { get; set; }
 		public List<StationData> Station { get; private set; }
 		public int ExecutedNum { get; private set; }
-		public bool? ExecStatus { get; private set; }
+		public bool? IsFinished { get; private set; }
 		public int FailedNum { get; private set; }
 		public int FCheckNum { get; private set; }
 		private SearchData SearchFunc;
@@ -26,14 +26,14 @@ namespace LogProc {
 			Config = wd.Config;
 			Log = wd.Log;
 			Station = new List<StationData>();
-			ExecStatus = null;
+			IsFinished = null;
 		}
 
 		public void StartSearch() {
 			ExecutedNum = 0;
 			FailedNum = 0;
 			FCheckNum = 0;
-			ExecStatus = false;
+			IsFinished = false;
 			Abort = false;
 
 			string anv = Anv.GetFromFile();
@@ -60,7 +60,7 @@ namespace LogProc {
 				ExecutedNum++;
 			}
 
-			ExecStatus = true;
+			IsFinished = true;
 		}
 
 		private void LoadArea(string ContestAka) {

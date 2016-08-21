@@ -267,7 +267,8 @@ namespace LogProc {
 				//59##L
 				var hasStroke = Callsign.HasStroke(log.Callsign);
 				var areano = Contestno.GetAreano(log);
-				var stationAreano = Areano.GetFromStation(station, SubSelecter ? listMainArea : listSubArea);
+				var stationAreano = Areano.GetNoFromStation(station, SubSelecter ? listMainArea : listSubArea);
+				var suggests = Areano.GetSuggestFromStation(station, SubSelecter ? listMainArea : listSubArea);
 				if (!Freq.IsBeen(log.Freq)) {
 					ErrorReason.Set(listErr, Reason.InvalidFreq.ToString());
 				}
@@ -275,7 +276,7 @@ namespace LogProc {
 					ErrorReason.Set(listErr, Reason.RegionUnmatches.ToString());
 				}
 				if (!Station.IsMatched(areano, stationAreano) && station != null && !hasStroke) {
-					ErrorReason.Set(listErr, Reason.AddressUnmatches.ToString(), Utils.ConvTostrarrFromList(stationAreano));
+					ErrorReason.Set(listErr, Reason.AddressUnmatches.ToString(), Utils.ConvTostrarrFromList(suggests));
 				}
 				if (!Areano.IsBeen(SubSelecter ? listMainArea : listSubArea, areano)) {
 					ErrorReason.Set(listErr, Reason.ReceivedCnUnexists.ToString(), Utils.ConvTostrarrFromList(Areano.GetFromList(Station.GetList(station), listMainArea)));

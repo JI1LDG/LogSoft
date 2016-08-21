@@ -11,8 +11,9 @@ namespace LogProc {
 	/// OutputSummery.xaml の相互作用ロジック
 	/// </summary>
 	public partial class OutputSummery : Window {
-		public OutputSummery(WorkingData wd, ISummery isp) {
-			OutputLog ol = new OutputLog(wd, isp);
+		public OutputSummery(WorkingData wd, InterSet[] isp) {
+
+			OutputLog ol = new OutputLog(wd, isp[0].Sum);
 			if (!ol.Execute()) {
 				MessageBox.Show("サマリ作成に失敗しました。", "通知");
 				return;

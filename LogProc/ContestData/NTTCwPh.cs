@@ -173,7 +173,8 @@ namespace LogProc {
 				var hasStroke = Callsign.HasStroke(log.Callsign);
 				var areano = Contestno.GetAreano(log);
 				var phoneRegion = Contestno.GetPhoneRegion(areano, listMainArea);
-				var stationAreano = Areano.GetFromStation(station, listMainArea);
+				var stationAreano = Areano.GetNoFromStation(station, listMainArea);
+				var suggests = Areano.GetSuggestFromStation(station, listMainArea);
 				char lrc = log.ReceivedCn[log.ReceivedCn.Length - 1];
 				if (lrc != 'N' && !('0' <= lrc && lrc <= '9')) {
 					ErrorReason.Set(listErr, ExtraReason.InvalidSignOfCn.ToString());
@@ -196,7 +197,7 @@ namespace LogProc {
 						ErrorReason.Set(listErr, Reason.RegionUnmatches.ToString());
 					}
 					if (!Station.IsMatched(areano, stationAreano) && station != null && !hasStroke) {
-						ErrorReason.Set(listErr, Reason.AddressUnmatches.ToString(), Utils.ConvTostrarrFromList(stationAreano));
+						ErrorReason.Set(listErr, Reason.AddressUnmatches.ToString(), Utils.ConvTostrarrFromList(suggests));
 					}
 				}
 			}
