@@ -1,5 +1,6 @@
 ﻿using System.Data.SQLite;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -12,35 +13,37 @@ namespace LogProc {
 		public ObservableCollection<LogData> Log { get; set; }
 		public List<StationData> Station { get; private set; }
 		public int ExecutedNum { get; private set; }
-		public bool? IsFinished { get; private set; }
 		public int FailedNum { get; private set; }
 		public int FCheckNum { get; private set; }
 		private SearchData SearchFunc;
-		public bool Abort { get; private set; }
 		private List<Area> AreaData { get; set; }
 		private Setting Config;
 		private ISearch Plugins;
+		private BackgroundWorker Worker;
 
 		public SearchLog(WorkingData wd, ISearch isp) {
 			Plugins = isp;
 			Config = wd.Config;
 			Log = wd.Log;
 			Station = new List<StationData>();
-			IsFinished = null;
 		}
 
-		public void StartSearch() {
+		public void SetWorker(BackgroundWorker worker) {
+			this.Worker = worker;
+		}
+
+		public void StartSearch(object sender, DoWorkEventArgs e) {
 			ExecutedNum = 0;
 			FailedNum = 0;
 			FCheckNum = 0;
-			IsFinished = false;
-			Abort = false;
 
 			string anv = Anv.GetFromFile();
 			if(anv == null) anv = Anv.GetFromWeb();
 
 			foreach(LogData ld in Log) {
-				if(Abort) break;
+				if(this.Worker.CancellationPending) break;
+				this.Worker.ReportProgress(ExecutedNum);
+
 				ld.IsSearched = true;
 				ld.IsFinded = true;
 				ld.FailedStr = "";
@@ -59,8 +62,6 @@ namespace LogProc {
 				if(Plugins.isErrorAvailable) FCheckNum++;
 				ExecutedNum++;
 			}
-
-			IsFinished = true;
 		}
 
 		private void LoadArea(string ContestAka) {
@@ -98,10 +99,6 @@ namespace LogProc {
 				}
 			}
 			sr.Close();
-		}
-
-		public void DoAbort() {
-			Abort = true;
 		}
 
 		public string GetCondition() {
