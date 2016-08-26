@@ -21,8 +21,8 @@ namespace LogProc {
 		private List<InterSet>[] Intersets { get; set; }
 		private InterSet[] nowItst { get; set; }
 
-		private string Version { get { return "0.8.64"; } }
-		private string BuildTime { get { return "20160821"; } }
+		private string Version { get { return "0.8.65"; } }
+		private string BuildTime { get { return "20160827"; } }
 
 		public MainWindow() {
 			try {
